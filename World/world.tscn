@@ -1,0 +1,31 @@
+[gd_scene load_steps=5 format=3 uid="uid://kjdme6clrtyd"]
+
+[ext_resource type="Script" path="res://World/World.cs" id="1_tp6a2"]
+[ext_resource type="PackedScene" uid="uid://d2e0u4o6eefuv" path="res://Character/player.tscn" id="2_l0rib"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wbrob"]
+size = Vector3(10, 1, 10)
+
+[sub_resource type="BoxMesh" id="BoxMesh_r7nff"]
+size = Vector3(10, 1, 10)
+
+[node name="World" type="Node3D"]
+script = ExtResource("1_tp6a2")
+
+[node name="Player" parent="." instance=ExtResource("2_l0rib")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="Floor" type="StaticBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
+shape = SubResource("BoxShape3D_wbrob")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor"]
+mesh = SubResource("BoxMesh_r7nff")
+
+[node name="Camera3D" type="Camera3D" parent="Floor"]
+transform = Transform3D(1, 0, 0, 0, 1.19249e-08, 1, 0, -1, 1.19249e-08, 0, 10, 0)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Floor"]
+transform = Transform3D(1, 0, 0, 0, 1.19249e-08, 1, 0, -1, 1.19249e-08, 0, 30, 0)

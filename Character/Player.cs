@@ -5,20 +5,6 @@ public partial class Player : CharacterBody3D
 {
 	public const float Speed = 5.0f;
 	
-	public void GetInput()
-	{	
-		// Get the input direction and handle the movement/deceleration.
-		// As good practice, you should replace UI actions with custom gameplay actions.
-		Vector2 inputDir = Input.GetVector("MoveLeft", "MoveRight", "MoveUp", "MoveDown");
-		Vector3 direction = (Transform.Basis * new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
-		CalculateVelocity(inputDir, direction);
-		
-		if (Input.IsActionPressed("Fire"))
-		{
-			TryFire();
-		}
-	}
-	
 	public void CalculateVelocity(Vector2 inputDir, Vector3 direction)
 	{
 		Vector3 velocity = Velocity;
@@ -38,22 +24,40 @@ public partial class Player : CharacterBody3D
 	}
 	
 	public override void _PhysicsProcess(double delta)
-	{
-		// Calculates velocity and deals with any additional actions
-		GetInput();
-		
+	{	
 		// Add the gravity.
 		if (!IsOnFloor())
 		{
 			Velocity += GetGravity() * (float)delta;
 		}
 		
+		// Get the input direction and handle the movement/deceleration.
+		Vector2 inputDir = Input.GetVector("MoveLeft", "MoveRight", "MoveUp", "MoveDown");
+		Vector3 direction = (Transform.Basis * new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
+		CalculateVelocity(inputDir, direction);
+		
 		MoveAndSlide();
+		
+		if (Input.IsActionPressed("Fire"))
+		{
+			TryFire();
+		}
+	}
+	
+	public override void _Input(InputEvent @event)
+	{
+		if (@event is InputEventMouseMotion eventMouseMotion)
+		{
+			Vector2 relative = eventMouseMotion.GetRelative();
+			LookAt(new Vector3(relative[0], Position[1], relative[1]), Vector3.Up);
+		}
+		// Print the size of the viewport.
+		//GD.Print("Viewport Resolution is: ", GetViewport().GetVisibleRect().Size);
 	}
 	
 	public void TryFire()
 	{
-		GetWeapon().TriggerFire();
+		GetWeapon().PressTrigger();
 	}
 	
 	public Weapon GetWeapon()
