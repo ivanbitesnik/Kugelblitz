@@ -1,6 +1,6 @@
 [gd_scene load_steps=4 format=3 uid="uid://kjdme6clrtyd"]
 
-[ext_resource type="PackedScene" uid="uid://d2e0u4o6eefuv" path="res://player.tscn" id="1_edou4"]
+[ext_resource type="PackedScene" uid="uid://d2e0u4o6eefuv" path="res://Character/player.tscn" id="1_w1kab"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_wbrob"]
 size = Vector3(10, 1, 10)
@@ -10,7 +10,7 @@ size = Vector3(10, 1, 10)
 
 [node name="World" type="Node3D"]
 
-[node name="Player" parent="." instance=ExtResource("1_edou4")]
+[node name="Player" parent="." instance=ExtResource("1_w1kab")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 
 [node name="Floor" type="StaticBody3D" parent="."]
