@@ -3,7 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Kugelblitz;
+namespace Kugelblitz.GravityHandler;
 
 public class GravityHandler
 {
