@@ -25,7 +25,17 @@ shape = SubResource("BoxShape3D_wbrob")
 mesh = SubResource("BoxMesh_r7nff")
 
 [node name="Camera3D" type="Camera3D" parent="Floor"]
+<<<<<<< HEAD:World/world.tscn
 transform = Transform3D(1, 0, 0, 0, 1.19249e-08, 1, 0, -1, 1.19249e-08, 0, 10, 0)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="Floor"]
 transform = Transform3D(1, 0, 0, 0, 1.19249e-08, 1, 0, -1, 1.19249e-08, 0, 30, 0)
+=======
+transform = Transform3D(1, 0, 0, 0, 0.0401318, 0.999194, 0, -0.999194, 0.0401318, 0, 8, 0)
+
+[node name="SpotLight3D" type="SpotLight3D" parent="."]
+transform = Transform3D(-1, -7.64274e-15, -8.74228e-08, -8.73522e-08, 0.0401842, 0.999192, 3.513e-09, 0.999192, -0.0401842, 0, 4, 0)
+light_size = 0.556
+
+[node name="RigidBody3D" parent="." instance=ExtResource("2_7udc8")]
+>>>>>>> 4d7701c956e640379dadcc85fb3ef40d4bd9896a:world.tscn
