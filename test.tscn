@@ -1,6 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://kjdme6clrtyd"]
+[gd_scene load_steps=5 format=3 uid="uid://kjdme6clrtyd"]
 
 [ext_resource type="PackedScene" uid="uid://d2e0u4o6eefuv" path="res://player.tscn" id="1_edou4"]
+[ext_resource type="PackedScene" uid="uid://cu2oug83b5ga7" path="res://graviton.tscn" id="2_7udc8"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_wbrob"]
 size = Vector3(10, 1, 10)
@@ -21,3 +22,12 @@ shape = SubResource("BoxShape3D_wbrob")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Floor"]
 mesh = SubResource("BoxMesh_r7nff")
+
+[node name="Camera3D" type="Camera3D" parent="Floor"]
+transform = Transform3D(1, 0, 0, 0, 0.0401318, 0.999194, 0, -0.999194, 0.0401318, 0, 8, 0)
+
+[node name="SpotLight3D" type="SpotLight3D" parent="."]
+transform = Transform3D(-1, -7.64274e-15, -8.74228e-08, -8.73522e-08, 0.0401842, 0.999192, 3.513e-09, 0.999192, -0.0401842, 0, 4, 0)
+light_size = 0.556
+
+[node name="RigidBody3D" parent="." instance=ExtResource("2_7udc8")]

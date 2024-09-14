@@ -5,6 +5,8 @@ public partial class Player : CharacterBody3D
 {
 	public const float Speed = 5.0f;
 	public const float JumpVelocity = 4.5f;
+	[Export] private bool isAttractor;
+	[Export] private bool isAttractee;
 
 	public override void _PhysicsProcess(double delta)
 	{

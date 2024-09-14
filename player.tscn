@@ -8,14 +8,10 @@
 
 [node name="Player" type="CharacterBody3D"]
 script = ExtResource("1_rrd4t")
+isAttractee = true
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("CapsuleShape3D_y6icq")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 mesh = SubResource("CapsuleMesh_2q4e4")
-
-[node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.302, 1, 2.708)
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
