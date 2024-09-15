@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=3 uid="uid://d2e0u4o6eefuv"]
+[gd_scene load_steps=7 format=3 uid="uid://d2e0u4o6eefuv"]
 
 [ext_resource type="Script" path="res://Character/Player.cs" id="1_rrd4t"]
 [ext_resource type="Script" path="res://Character/Weapon.cs" id="2_7aen2"]
@@ -7,7 +7,11 @@
 
 [sub_resource type="CapsuleMesh" id="CapsuleMesh_2q4e4"]
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7wgy4"]
+albedo_color = Color(0, 0, 0, 1)
+
 [sub_resource type="CylinderMesh" id="CylinderMesh_ypf1s"]
+material = SubResource("StandardMaterial3D_7wgy4")
 height = 5.135
 
 [node name="Player" type="CharacterBody3D"]

@@ -33,7 +33,7 @@ public partial class Player : CharacterBody3D
 		
 		// Get the input direction and handle the movement/deceleration.
 		Vector2 inputDir = Input.GetVector("MoveLeft", "MoveRight", "MoveUp", "MoveDown");
-		Vector3 direction = (Transform.Basis * new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
+		Vector3 direction = (new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
 		CalculateVelocity(inputDir, direction);
 		
 		MoveAndSlide();
@@ -48,9 +48,10 @@ public partial class Player : CharacterBody3D
 	{
 		if (@event is InputEventMouseMotion eventMouseMotion)
 		{
-			Vector2 relative = eventMouseMotion.GetRelative();
-			LookAt(new Vector3(relative[0], Position[1], relative[1]), Vector3.Up);
+			Vector2 screenRelative = eventMouseMotion.GetScreenRelative();
+			LookAt(new Vector3(screenRelative[0], Position[1], screenRelative[1]), Vector3.Up);
 		}
+		
 		// Print the size of the viewport.
 		//GD.Print("Viewport Resolution is: ", GetViewport().GetVisibleRect().Size);
 	}

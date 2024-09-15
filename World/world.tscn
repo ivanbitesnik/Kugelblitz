@@ -1,41 +1,32 @@
-[gd_scene load_steps=5 format=3 uid="uid://kjdme6clrtyd"]
+[gd_scene load_steps=5 format=3 uid="uid://lww6l03potuj"]
 
-[ext_resource type="Script" path="res://World/World.cs" id="1_tp6a2"]
-[ext_resource type="PackedScene" uid="uid://d2e0u4o6eefuv" path="res://Character/player.tscn" id="2_l0rib"]
+[ext_resource type="PackedScene" uid="uid://d2e0u4o6eefuv" path="res://Character/player.tscn" id="1_6jpm7"]
+[ext_resource type="Script" path="res://World/World.cs" id="1_mayt8"]
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_wbrob"]
-size = Vector3(10, 1, 10)
+[sub_resource type="BoxShape3D" id="BoxShape3D_5dw3w"]
+size = Vector3(30, 1, 30)
 
-[sub_resource type="BoxMesh" id="BoxMesh_r7nff"]
-size = Vector3(10, 1, 10)
+[sub_resource type="BoxMesh" id="BoxMesh_8rp31"]
+size = Vector3(30, 1, 30)
 
 [node name="World" type="Node3D"]
-script = ExtResource("1_tp6a2")
+script = ExtResource("1_mayt8")
 
-[node name="Player" parent="." instance=ExtResource("2_l0rib")]
+[node name="Ground" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+shape = SubResource("BoxShape3D_5dw3w")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+mesh = SubResource("BoxMesh_8rp31")
+
+[node name="Player" parent="." instance=ExtResource("1_6jpm7")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 
-[node name="Floor" type="StaticBody3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
-shape = SubResource("BoxShape3D_wbrob")
-
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor"]
-mesh = SubResource("BoxMesh_r7nff")
-
-[node name="Camera3D" type="Camera3D" parent="Floor"]
-<<<<<<< HEAD:World/world.tscn
+[node name="Camera3D" type="Camera3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1.19249e-08, 1, 0, -1, 1.19249e-08, 0, 10, 0)
 
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="Floor"]
-transform = Transform3D(1, 0, 0, 0, 1.19249e-08, 1, 0, -1, 1.19249e-08, 0, 30, 0)
-=======
-transform = Transform3D(1, 0, 0, 0, 0.0401318, 0.999194, 0, -0.999194, 0.0401318, 0, 8, 0)
-
-[node name="SpotLight3D" type="SpotLight3D" parent="."]
-transform = Transform3D(-1, -7.64274e-15, -8.74228e-08, -8.73522e-08, 0.0401842, 0.999192, 3.513e-09, 0.999192, -0.0401842, 0, 4, 0)
-light_size = 0.556
-
-[node name="RigidBody3D" parent="." instance=ExtResource("2_7udc8")]
->>>>>>> 4d7701c956e640379dadcc85fb3ef40d4bd9896a:world.tscn
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1.19249e-08, 1, 0, -1, 1.19249e-08, 0, 50, 0)

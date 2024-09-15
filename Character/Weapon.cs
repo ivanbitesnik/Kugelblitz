@@ -39,7 +39,9 @@ public partial class Weapon : StaticBody3D
 	private void FireProjectile()
 	{
 		Projectile projectile = (Projectile)projectileScene.Instantiate();
-		projectile.Initialize(GetNode<Marker3D>("Muzzle").GlobalPosition, Rotation);
+		Vector3 muzzlePos = GetNode<Marker3D>("Muzzle").GlobalPosition;
+		Vector3 direction = (muzzlePos - Position).Normalized();
+		projectile.Initialize(muzzlePos, direction);
 		GetTree().Root.AddChild(projectile);
 	}
 	
