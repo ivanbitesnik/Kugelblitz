@@ -4,6 +4,9 @@ using System;
 public partial class Player : CharacterBody3D
 {
 	public const float Speed = 5.0f;
+	[Export] private bool isShootingOn;
+	[Export] private float dashDuration = 5.0f;
+	[Export] private float dashSpeed = 10.0f;
 	
 	public void CalculateVelocity(Vector2 inputDir, Vector3 direction)
 	{
@@ -35,10 +38,15 @@ public partial class Player : CharacterBody3D
 		Vector2 inputDir = Input.GetVector("MoveLeft", "MoveRight", "MoveUp", "MoveDown");
 		Vector3 direction = (new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
 		CalculateVelocity(inputDir, direction);
+
+		if (Input.IsActionPressed("dash")) Velocity *=  dashSpeed;
+		
+		//Dashing should go here?
 		
 		MoveAndSlide();
 		
-		if (Input.IsActionPressed("Fire"))
+		
+		if (Input.IsActionPressed("Fire") && this.isShootingOn)
 		{
 			TryFire();
 		}
