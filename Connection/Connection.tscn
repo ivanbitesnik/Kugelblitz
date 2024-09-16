@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://bgync5fq40m27"]
 
-[ext_resource type="Script" path="res://Connection.cs" id="1_nn17j"]
+[ext_resource type="Script" path="res://Connection/Connection.cs" id="1_nn17j"]
 
 [node name="Connection" type="Node"]
 script = ExtResource("1_nn17j")
