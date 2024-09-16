@@ -3,12 +3,11 @@ using System;
 
 public partial class Projectile : RigidBody3D
 {
-	public const float ProjectileSpeed = 20.0f;
 	
-	public void Initialize(Vector3 position, Vector3 direction)
+	public void Initialize(Vector3 position, Vector3 direction, float speed)
 	{
 		Position = position;
-		SetLinearVelocity(new Vector3(direction[0] * ProjectileSpeed, 0.0f, direction[2] * ProjectileSpeed));
+		SetLinearVelocity(new Vector3(direction[0] * speed, 0.0f, direction[2] * speed));
 	}
 	
 	// Called when the node enters the scene tree for the first time.

@@ -5,6 +5,8 @@ public partial class Weapon : StaticBody3D
 {
 	private PackedScene projectileScene = GD.Load<PackedScene>("res://Projectile/projectile.tscn");
 	public const double FireRate = 0.33f;
+
+	[Export] public float ProjectileSpeed = 200.0f;
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
@@ -39,9 +41,9 @@ public partial class Weapon : StaticBody3D
 	private void FireProjectile()
 	{
 		Projectile projectile = (Projectile)projectileScene.Instantiate();
-		Vector3 muzzlePos = GetNode<Marker3D>("Muzzle").GlobalPosition;
-		Vector3 direction = (muzzlePos - Position).Normalized();
-		projectile.Initialize(muzzlePos, direction);
+		Vector3 direction = -GetGlobalTransform().Basis.Y;
+		Vector3 muzzlePos = GetNode<Marker3D>("Muzzle").GlobalPosition + (direction * 3.0f);
+		projectile.Initialize(muzzlePos, direction, ProjectileSpeed);
 		GetTree().Root.AddChild(projectile);
 	}
 	
