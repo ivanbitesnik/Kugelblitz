@@ -3,7 +3,7 @@ using System;
 
 public partial class Weapon : StaticBody3D
 {
-	private PackedScene projectileScene = GD.Load<PackedScene>("res://Projectile/projectile.tscn");
+	[Export] private PackedScene projectileScene = GD.Load<PackedScene>("res://Projectile/projectile.tscn");
 	public const double FireRate = 0.33f;
 
 	[Export] public float ProjectileSpeed = 200.0f;
@@ -44,7 +44,7 @@ public partial class Weapon : StaticBody3D
 		Vector3 direction = -GetGlobalTransform().Basis.Y;
 		Vector3 muzzlePos = GetNode<Marker3D>("Muzzle").GlobalPosition + (direction * 3.0f);
 		projectile.Initialize(muzzlePos, direction, ProjectileSpeed);
-		GetTree().Root.AddChild(projectile);
+		GetParent().AddChild(projectile);
 	}
 	
 	private double LastShotTimestamp = -1.0f;
