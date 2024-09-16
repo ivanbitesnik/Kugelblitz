@@ -76,6 +76,8 @@ public partial class Player : CharacterBody3D
 		{
 			TryFire();
 		}
+
+		
 	}
 
 	private void LookAtCursor(Vector2 mousePos)

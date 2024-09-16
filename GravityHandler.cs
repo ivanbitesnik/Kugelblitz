@@ -7,26 +7,23 @@ namespace Kugelblitz.GravityHandler;
 
 public class GravityHandler
 {
-	[Export] public static float Gravity;
+	[Export] public static float Gravity = 9.8f;
 	private IEnumerable<RigidBody3D> Attractors;
 	private IEnumerable<RigidBody3D> Attractees;
 
 
-	public static void AddGravityForce(RigidBody3D attractor, RigidBody3D target)
+	public static void AddGravityForce(RigidBody3D target)
 	{
-		float massProduct = attractor.Mass * target.Mass;
+		var attractorMass = 50000;
+		var pos = Vector3.Zero;
+		float massProduct = attractorMass * target.Mass;
 		
-		Vector3 difference = attractor.Position - target.Position;
-		
-		//Estos X Y habría que chequear si son asi posta
-		//prob x z o algo así
-		float distance = Mathf.Sqrt((MathF.Pow(difference.X, 2)) + (MathF.Pow(difference.Y, 2)));
-		
-		float unScaledforceMagnitude = massProduct / MathF.Pow(distance, 2);
+		float distanceSquared = target.Position.DistanceSquaredTo(pos);
+
+		float unScaledforceMagnitude = massProduct / distanceSquared;
 		float forceMagnitude = Gravity * unScaledforceMagnitude;
 		
-		Vector3 forceDirection = difference.Normalized();
-		
+		Vector3 forceDirection = target.Position.DirectionTo(pos);
 		Vector3 forceVector = forceDirection * forceMagnitude;
 		
 		target.AddConstantForce(forceVector);

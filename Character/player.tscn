@@ -16,6 +16,8 @@ height = 5.135
 
 [node name="Player" type="CharacterBody3D"]
 script = ExtResource("1_rrd4t")
+DashDistance = 70.0
+DashCooldown = 1.0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("CapsuleShape3D_y6icq")
@@ -24,7 +26,7 @@ shape = SubResource("CapsuleShape3D_y6icq")
 mesh = SubResource("CapsuleMesh_2q4e4")
 
 [node name="Weapon" type="StaticBody3D" parent="."]
-transform = Transform3D(0.1, 0, 0, 0, -4.37114e-09, -0.1, 0, 0.1, -4.37114e-09, 0, 0, -0.564597)
+transform = Transform3D(0.1, 0, 0, 0, -4.37114e-09, -0.1, 0, 0.1, -4.37114e-09, -0.00343966, 0, -0.559414)
 script = ExtResource("2_7aen2")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Weapon"]
