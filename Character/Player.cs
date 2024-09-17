@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Linq;
 using System.Reflection.Metadata;
 
 public partial class Player : CharacterBody3D
@@ -9,6 +10,7 @@ public partial class Player : CharacterBody3D
 	[Export] private float DashDuration = 0.1f;
 	[Export] private float DashDistance = 50.0f;
 	[Export] private float DashCooldown = 1.0f;
+	[Export] private Camera3D Camera;
 
 	private float DashTimeLeft = 0.0f;
 	private float DashCooldownLeft = 0.0f;
@@ -69,19 +71,36 @@ public partial class Player : CharacterBody3D
 		CalculateVelocity(delta, direction);
 		
 		MoveAndSlide();
-		
+
 		if (Input.IsActionPressed("Fire") && IsShootingOn)
 		{
 			TryFire();
 		}
+	}
+
+	private void LookAtCursor(Vector2 mousePos)
+	{
+		PhysicsDirectSpaceState3D spaceState = GetWorld3D().DirectSpaceState;
+
+		Vector3 rayOrigin = Camera.ProjectRayOrigin(mousePos);
+		Vector3 rayEnd = rayOrigin + Camera.ProjectRayNormal(mousePos) * 2000.0f;
+
+		PhysicsRayQueryParameters3D queryParams = PhysicsRayQueryParameters3D.Create(rayOrigin, rayEnd);
+		Godot.Collections.Dictionary hit = spaceState.IntersectRay(queryParams);
+
+		if (hit.Count != 0)
+		{
+			Vector3 hitPos = (Vector3)hit["position"];
+			LookAt(new Vector3(hitPos.X, Position.Y, hitPos.Z), Vector3.Up);
+		}
+
 	}
 	
 	public override void _Input(InputEvent @event)
 	{
 		if (@event is InputEventMouseMotion eventMouseMotion)
 		{
-			Vector2 screenRelative = eventMouseMotion.GetScreenRelative();
-			LookAt(new Vector3(screenRelative[0], Position[1], screenRelative[1]), Vector3.Up);
+			LookAtCursor(eventMouseMotion.Position);
 		}
 
 		if (@event.IsActionPressed("dash"))

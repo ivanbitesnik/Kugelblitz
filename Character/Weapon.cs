@@ -44,7 +44,7 @@ public partial class Weapon : StaticBody3D
 		Vector3 direction = -GetGlobalTransform().Basis.Y;
 		Vector3 muzzlePos = GetNode<Marker3D>("Muzzle").GlobalPosition + (direction * 3.0f);
 		projectile.Initialize(muzzlePos, direction, ProjectileSpeed);
-		GetParent().AddChild(projectile);
+		GetTree().Root.AddChild(projectile);
 	}
 	
 	private double LastShotTimestamp = -1.0f;
