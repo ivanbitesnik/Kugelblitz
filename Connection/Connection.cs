@@ -6,25 +6,17 @@ public partial class Connection : Node
 	[Export] private int PORT = 8080;
 	[Export] private string ADDRESS = "127.0.0.1";
 	private PackedScene PlayerScene = GD.Load<PackedScene>("res://Character/player.tscn");
-
+	private CenterContainer Hud;
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		var upnp = new Upnp();
-		upnp.Discover();
-		upnp.AddPortMapping(PORT);
+		Multiplayer.PeerConnected += PeerConnected;
+		Multiplayer.PeerDisconnected += PeerDisconnected;
+		Hud = (CenterContainer)GetNode("CenterContainer");
 	}
 
-	private void ConnectedToServer()
-	{
-		GD.Print("Connected to server");
-	}
 
-	private void ServerDisconnected()
-	{
-		GD.Print("Server disconnected");
-	}
 
 	private void PeerDisconnected(long id)
 	{
@@ -32,69 +24,33 @@ public partial class Connection : Node
 	}
 
 	
-	private void PeerConnected(long id)
+	private void PeerConnected(long id = 1)
 	{
 		GD.Print("Peer connected ID:" + id.ToString());
 		var playerInstance = PlayerScene.Instantiate();
-		AddChild(playerInstance);
+		playerInstance.Name = id.ToString();
+		AddChild(playerInstance, true);
 	}
-
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(double delta)
-	{
-	}
+	
 
 	private void _on_host_pressed()
 	{
 		ENetMultiplayerPeer peer = new ENetMultiplayerPeer();
 		var err = peer.CreateServer(PORT, 2);
-		
-		//peer.Host.Compress(ENetConnection.CompressionMode.None);
-		
 		Multiplayer.MultiplayerPeer = peer;
 		GD.Print("Waiting for players");
-		
-		Multiplayer.PeerDisconnected += remove_player;
-
-		LoadGame();
-
+		PeerConnected();
+		Hud.Hide();
 	}
 
-	
+
 	private void _on_join_pressed()
 	{
 		ENetMultiplayerPeer peer = new ENetMultiplayerPeer();
 		var err = peer.CreateClient(ADDRESS, PORT);
-		
-		peer.Host.Compress(ENetConnection.CompressionMode.None);
 		Multiplayer.MultiplayerPeer = peer;
 		GD.Print("Waiting to join");
-		
-		Multiplayer.ConnectedToServer += LoadGame;
-		Multiplayer.ServerDisconnected += ConnectionLost;
+		Hud.Hide();
 	}
 
-	private void LoadGame()
-	{
-		add_player(Multiplayer.GetUniqueId());
-	}
-
-	private void ConnectionLost()
-	{
-		
-	}
-
-	[Rpc(MultiplayerApi.RpcMode.AnyPeer)]
-	private void add_player(long id)
-	{
-		var player = PlayerScene.Instantiate();
-		player.Name = id.ToString();
-		GetTree().Root.AddChild(player);
-	}
-	[Rpc(MultiplayerApi.RpcMode.AnyPeer)]
-	private void remove_player(long id)
-	{
-		
-	}
-	
 }
