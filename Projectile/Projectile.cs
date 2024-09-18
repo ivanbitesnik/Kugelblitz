@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Kugelblitz.GravityHandler;
 
 public partial class Projectile : RigidBody3D
 {
@@ -18,15 +19,11 @@ public partial class Projectile : RigidBody3D
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
-	{
-		//var collision = MoveAndCollide(Velocity * (float)delta);
-		//if (collision != null)
-		//{
-		//	Velocity = Velocity.Bounce(collision.GetNormal());
-		//	if (collision.GetCollider().HasMethod("Hit"))
-		//	{
-		//		collision.GetCollider().Call("Hit");
-		//	}
-		//}
+	{	
+		//var attractor = blabla
+		
+		GravityHandler.AddGravityForce(this);
+		
+		
 	}
 }

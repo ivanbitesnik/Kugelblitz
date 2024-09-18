@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3 uid="uid://d2e0u4o6eefuv"]
+[gd_scene load_steps=8 format=3 uid="uid://d2e0u4o6eefuv"]
 
 [ext_resource type="Script" path="res://Character/Player.cs" id="1_rrd4t"]
 [ext_resource type="Script" path="res://Character/Weapon.cs" id="2_7aen2"]
@@ -14,8 +14,14 @@ albedo_color = Color(0, 0, 0, 1)
 material = SubResource("StandardMaterial3D_7wgy4")
 height = 5.135
 
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_ov1yv"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+
 [node name="Player" type="CharacterBody3D"]
 script = ExtResource("1_rrd4t")
+DashDistance = 70.0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("CapsuleShape3D_y6icq")
@@ -24,7 +30,7 @@ shape = SubResource("CapsuleShape3D_y6icq")
 mesh = SubResource("CapsuleMesh_2q4e4")
 
 [node name="Weapon" type="StaticBody3D" parent="."]
-transform = Transform3D(0.1, 0, 0, 0, -4.37114e-09, -0.1, 0, 0.1, -4.37114e-09, 0, 0, -0.564597)
+transform = Transform3D(0.1, 0, 0, 0, -4.37114e-09, -0.1, 0, 0.1, -4.37114e-09, -0.00343966, 0, -0.559414)
 script = ExtResource("2_7aen2")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Weapon"]
@@ -33,3 +39,6 @@ mesh = SubResource("CylinderMesh_ypf1s")
 
 [node name="Muzzle" type="Marker3D" parent="Weapon"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -4.26834, -2.57175)
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_ov1yv")

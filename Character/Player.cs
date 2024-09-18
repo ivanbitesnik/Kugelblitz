@@ -15,6 +15,11 @@ public partial class Player : CharacterBody3D
 	private float DashTimeLeft = 0.0f;
 	private float DashCooldownLeft = 0.0f;
 	
+	
+	private void _EnterTree()
+	{
+		SetMultiplayerAuthority(Int32.Parse(Name));
+	}
 	private void CalculateVelocity(double delta, Vector3 direction)
 	{
 		Vector3 velocity = Velocity;
@@ -64,7 +69,9 @@ public partial class Player : CharacterBody3D
 	}
 	
 	public override void _PhysicsProcess(double delta)
-	{	
+	{
+		if (!IsMultiplayerAuthority()) return;
+			
 		// Add the gravity.
 		if (!IsOnFloor())
 		{
@@ -82,6 +89,8 @@ public partial class Player : CharacterBody3D
 		{
 			TryFire();
 		}
+
+		
 	}
 
 	private void LookAtCursor(Vector2 mousePos)
