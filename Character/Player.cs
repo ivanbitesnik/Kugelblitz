@@ -30,22 +30,20 @@ public partial class Player : CharacterBody3D
 			velocity.Z = Mathf.MoveToward(Velocity.Z, 0, Speed);
 		}
 
-		velocity += CalculateDashVelocity(delta, direction);
+		CalculateDashVelocity(delta, ref velocity);
 		Velocity = velocity;
 	}
 
-	private Vector3 CalculateDashVelocity(double delta, Vector3 direction)
+	private void CalculateDashVelocity(double delta, ref Vector3 velocity)
 	{
-		Vector3 velocity = Vector3.Zero;
-
-		if (DashCooldownLeft > 0.0f)
+		if (IsDashOnCooldown())
 		{
 			DashCooldownLeft = (float)Mathf.Clamp(DashCooldownLeft - delta, 0.0f, DashCooldownLeft);
 		}
-		else if (DashTimeLeft > 0.0f)
+		else if (IsDashing())
 		{
-			Vector3 dashDirection = (direction == Vector3.Zero ? -GetGlobalTransform().Basis.Z : direction);
-			velocity = ((DashDistance * (float)delta) / DashDuration) * dashDirection;
+			Vector3 dashDirection = (velocity == Vector3.Zero ? -GetGlobalTransform().Basis.Z : velocity.Normalized());
+			velocity += ((DashDistance * (float)delta) / DashDuration) * dashDirection;
 
 			DashTimeLeft = (float)Mathf.Clamp(DashTimeLeft - delta, 0.0f, DashTimeLeft);
 			if (DashTimeLeft <= 0.0f)
@@ -53,8 +51,16 @@ public partial class Player : CharacterBody3D
 				DashCooldownLeft = DashCooldown;
 			}
 		}
+	}
 
-		return velocity;
+	public bool IsDashing()
+	{
+		return DashTimeLeft > 0.0f;
+	}
+
+	public bool IsDashOnCooldown()
+	{
+		return DashCooldownLeft > 0.0f;
 	}
 	
 	public override void _PhysicsProcess(double delta)
@@ -105,7 +111,7 @@ public partial class Player : CharacterBody3D
 
 		if (@event.IsActionPressed("dash"))
 		{
-			if (DashCooldownLeft <= 0.0f)
+			if (!IsDashOnCooldown())
 			{
 				DashTimeLeft = DashDuration;
 			}
