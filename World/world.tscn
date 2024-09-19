@@ -16,8 +16,7 @@ transform = Transform3D(1, 0, 0, 0, 1.19249e-08, 1, 0, -1, 1.19249e-08, 0, 50, 0
 [node name="Arena" parent="." instance=ExtResource("2_eqej4")]
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
-_spawnable_scenes = PackedStringArray("res://Character/player.tscn")
+_spawnable_scenes = PackedStringArray("res://Character/player.tscn", "res://Projectile/projectile.tscn")
 spawn_path = NodePath("..")
-spawn_limit = 2
 
 [node name="Connection" parent="." instance=ExtResource("3_q5jir")]

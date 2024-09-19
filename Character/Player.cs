@@ -10,16 +10,20 @@ public partial class Player : CharacterBody3D
 	[Export] private float DashDuration = 0.1f;
 	[Export] private float DashDistance = 50.0f;
 	[Export] private float DashCooldown = 1.0f;
-	[Export] private Camera3D Camera;
 
 	private float DashTimeLeft = 0.0f;
 	private float DashCooldownLeft = 0.0f;
 	
-	
-	private void _EnterTree()
+	public override void _EnterTree()
 	{
-		SetMultiplayerAuthority(Int32.Parse(Name));
+		GD.Print("Character spawned, ID: ", Name);
+		SetMultiplayerAuthority(int.Parse(Name));
+		Position = int.Parse(Name) == 1 ? new Vector3(0.0f, 1.0f, -3.0f) : new Vector3(0.0f, 1.0f, 3.0f);
+
+		StandardMaterial3D colorMaterial = new StandardMaterial3D() { AlbedoColor = int.Parse(Name) == 1 ? new Color(1.0f, 0.0f, 0.0f) : new Color(0.0f, 0.0f, 1.0f) };
+		GetNode<MeshInstance3D>("PlayerMesh").SetSurfaceOverrideMaterial(0, colorMaterial);
 	}
+
 	private void CalculateVelocity(double delta, Vector3 direction)
 	{
 		Vector3 velocity = Velocity;
@@ -71,7 +75,7 @@ public partial class Player : CharacterBody3D
 	public override void _PhysicsProcess(double delta)
 	{
 		if (!IsMultiplayerAuthority()) return;
-			
+
 		// Add the gravity.
 		if (!IsOnFloor())
 		{
@@ -89,16 +93,15 @@ public partial class Player : CharacterBody3D
 		{
 			TryFire();
 		}
-
-		
 	}
 
 	private void LookAtCursor(Vector2 mousePos)
 	{
 		PhysicsDirectSpaceState3D spaceState = GetWorld3D().DirectSpaceState;
 
-		Vector3 rayOrigin = Camera.ProjectRayOrigin(mousePos);
-		Vector3 rayEnd = rayOrigin + Camera.ProjectRayNormal(mousePos) * 2000.0f;
+		Camera3D camera = GetCamera();
+		Vector3 rayOrigin = camera.ProjectRayOrigin(mousePos);
+		Vector3 rayEnd = rayOrigin + camera.ProjectRayNormal(mousePos) * 2000.0f;
 
 		PhysicsRayQueryParameters3D queryParams = PhysicsRayQueryParameters3D.Create(rayOrigin, rayEnd);
 		Godot.Collections.Dictionary hit = spaceState.IntersectRay(queryParams);
@@ -108,7 +111,6 @@ public partial class Player : CharacterBody3D
 			Vector3 hitPos = (Vector3)hit["position"];
 			LookAt(new Vector3(hitPos.X, Position.Y, hitPos.Z), Vector3.Up);
 		}
-
 	}
 	
 	public override void _Input(InputEvent @event)
@@ -135,5 +137,10 @@ public partial class Player : CharacterBody3D
 	public Weapon GetWeapon()
 	{
 		return GetNode<Weapon>("Weapon");
+	}
+
+	public Camera3D GetCamera()
+	{
+		return GetTree().Root.GetNode<Camera3D>("World/Camera");
 	}
 }
