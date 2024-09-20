@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://cu2oug83b5ga7"]
+[gd_scene load_steps=5 format=3 uid="uid://cu2oug83b5ga7"]
 
 [ext_resource type="Script" path="res://Graviton.cs" id="1_b8me3"]
 
@@ -6,12 +6,34 @@
 
 [sub_resource type="SphereMesh" id="SphereMesh_80nj0"]
 
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_jtbjp"]
+properties/0/path = NodePath(".:mass")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:position")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+properties/2/path = NodePath("MeshInstance3D:skeleton")
+properties/2/spawn = true
+properties/2/replication_mode = 1
+properties/3/path = NodePath(".:InfluenceRange")
+properties/3/spawn = true
+properties/3/replication_mode = 1
+properties/4/path = NodePath(".:Intensity")
+properties/4/spawn = true
+properties/4/replication_mode = 1
+
 [node name="Graviton" type="RigidBody3D"]
 script = ExtResource("1_b8me3")
 isAttractor = true
+InfluenceRange = 1000.0
+Intensity = 100.0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("SphereShape3D_0p0xk")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 mesh = SubResource("SphereMesh_80nj0")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_jtbjp")
