@@ -10,22 +10,38 @@ public partial class Player : CharacterBody3D
 	[Export] private float DashDuration = 0.1f;
 	[Export] private float DashDistance = 50.0f;
 	[Export] private float DashCooldown = 1.0f;
+	[Export] Color PlayerOneColor = new Color(1.0f, 0.0f, 0.0f);
+	[Export] Color PlayerTwoColor = new Color(0.0f, 0.0f, 1.0f);
 
 	private float DashTimeLeft = 0.0f;
 	private float DashCooldownLeft = 0.0f;
 	
-	public override void _EnterTree()
+	public int GetId()
 	{
-		SetMultiplayerAuthority(int.Parse(Name));
-		string contextString = IsMultiplayerAuthority() ? "Server" : "Client";
-		GD.Print("Character spawned, ID: ", Name, ", Context: ", contextString);
-		Position = int.Parse(Name) == 1 ? new Vector3(0.0f, 1.0f, -3.0f) : new Vector3(0.0f, 1.0f, 3.0f);
-
-		StandardMaterial3D colorMaterial = new StandardMaterial3D() { AlbedoColor = int.Parse(Name) == 1 ? new Color(1.0f, 0.0f, 0.0f) : new Color(0.0f, 0.0f, 1.0f) };
-		GetNode<MeshInstance3D>("PlayerMesh").SetSurfaceOverrideMaterial(0, colorMaterial);
+		return int.Parse(Name);
 	}
 
-	private void CalculateVelocity(double delta, Vector3 direction)
+	public bool IsServer()
+	{
+		return GetId() == 1;
+	}
+
+	public override void _EnterTree()
+	{
+		SetMultiplayerAuthority(GetId());
+		string contextString = IsServer() ? "Server" : "Client";
+		GD.Print("Character spawned, ID: ", Name, ", Context: ", contextString);
+	}
+
+    public override void _Ready()
+    {
+        Position = IsServer() ? GetTree().Root.GetNode<Marker3D>("World/Arena/PlayerOneSpawnPoint").Position : GetTree().Root.GetNode<Marker3D>("World/Arena/PlayerTwoSpawnPoint").Position;
+
+		StandardMaterial3D colorMaterial = new StandardMaterial3D() { AlbedoColor = IsServer() ? PlayerOneColor : PlayerTwoColor };
+		GetNode<MeshInstance3D>("PlayerMesh").SetSurfaceOverrideMaterial(0, colorMaterial);
+    }
+
+    private void CalculateVelocity(double delta, Vector3 direction)
 	{
 		Vector3 velocity = Velocity;
 		

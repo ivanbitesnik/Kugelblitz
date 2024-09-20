@@ -23,6 +23,8 @@ can_sleep = false
 lock_rotation = true
 freeze = true
 freeze_mode = 1
+InfluenceRange = 10.0
+Intensity = 50.0
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
 _spawnable_scenes = PackedStringArray("res://Character/player.tscn", "res://Projectile/projectile.tscn")
