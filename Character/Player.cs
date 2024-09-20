@@ -39,6 +39,8 @@ public partial class Player : CharacterBody3D
 
 		StandardMaterial3D colorMaterial = new StandardMaterial3D() { AlbedoColor = IsServer() ? PlayerOneColor : PlayerTwoColor };
 		GetNode<MeshInstance3D>("PlayerMesh").SetSurfaceOverrideMaterial(0, colorMaterial);
+
+		SetAxisLock(PhysicsServer3D.BodyAxis.LinearY, true);
     }
 
     private void CalculateVelocity(double delta, Vector3 direction)

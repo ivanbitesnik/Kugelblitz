@@ -1,30 +1,19 @@
-[gd_scene load_steps=5 format=3 uid="uid://lww6l03potuj"]
+[gd_scene load_steps=4 format=3 uid="uid://lww6l03potuj"]
 
 [ext_resource type="Script" path="res://World/World.cs" id="1_mayt8"]
 [ext_resource type="PackedScene" uid="uid://cr6mdaotauit7" path="res://Arena/Arena.tscn" id="2_eqej4"]
 [ext_resource type="PackedScene" uid="uid://bgync5fq40m27" path="res://Connection/Connection.tscn" id="3_q5jir"]
-[ext_resource type="PackedScene" uid="uid://cu2oug83b5ga7" path="res://graviton.tscn" id="4_m34x0"]
 
 [node name="World" type="Node3D"]
 script = ExtResource("1_mayt8")
 
 [node name="Camera" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1.19249e-08, 1, 0, -1, 1.19249e-08, 0, 10, 0)
+transform = Transform3D(1, 0, 0, 0, 1.19249e-08, 1, 0, -1, 1.19249e-08, 0, 20, 0)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1.19249e-08, 1, 0, -1, 1.19249e-08, 0, 50, 0)
 
 [node name="Arena" parent="." instance=ExtResource("2_eqej4")]
-
-[node name="Graviton" parent="." instance=ExtResource("4_m34x0")]
-mass = 100.0
-gravity_scale = 0.0
-can_sleep = false
-lock_rotation = true
-freeze = true
-freeze_mode = 1
-InfluenceRange = 10.0
-Intensity = 50.0
 
 [node name="MultiplayerSpawner" type="MultiplayerSpawner" parent="."]
 _spawnable_scenes = PackedStringArray("res://Character/player.tscn", "res://Projectile/projectile.tscn")

@@ -28,6 +28,7 @@ properties/2/replication_mode = 1
 [node name="Player" type="CharacterBody3D"]
 script = ExtResource("1_rrd4t")
 DashDistance = 70.0
+PlayerOneColor = Color(0, 1, 0, 1)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("CapsuleShape3D_y6icq")

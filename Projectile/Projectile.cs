@@ -17,7 +17,9 @@ public partial class Projectile : RigidBody3D
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
-		Graviton = GetTree().Root.GetNode<Graviton>("World/Graviton");
+		SetAxisLock(PhysicsServer3D.BodyAxis.LinearY, true);
+
+		Graviton = GetTree().Root.GetNode<Graviton>("World/Arena/Graviton");
 	}
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.

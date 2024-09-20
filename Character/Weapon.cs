@@ -5,7 +5,7 @@ public partial class Weapon : StaticBody3D
 {
 	[Export] private PackedScene projectileScene = GD.Load<PackedScene>("res://Projectile/projectile.tscn");
 	[Export] public double FireRate = 0.33f;
-	[Export] public float ProjectileSpeed = 200.0f;
+	[Export] public float ProjectileSpeed = 500.0f;
 
 	private double LastShotTimestamp = -1.0f;
 	
