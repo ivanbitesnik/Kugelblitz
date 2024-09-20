@@ -16,8 +16,9 @@ public partial class Player : CharacterBody3D
 	
 	public override void _EnterTree()
 	{
-		GD.Print("Character spawned, ID: ", Name);
 		SetMultiplayerAuthority(int.Parse(Name));
+		string contextString = IsMultiplayerAuthority() ? "Server" : "Client";
+		GD.Print("Character spawned, ID: ", Name, ", Context: ", contextString);
 		Position = int.Parse(Name) == 1 ? new Vector3(0.0f, 1.0f, -3.0f) : new Vector3(0.0f, 1.0f, 3.0f);
 
 		StandardMaterial3D colorMaterial = new StandardMaterial3D() { AlbedoColor = int.Parse(Name) == 1 ? new Color(1.0f, 0.0f, 0.0f) : new Color(0.0f, 0.0f, 1.0f) };
