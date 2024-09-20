@@ -26,6 +26,6 @@ public class GravityHandler
 		Vector3 forceDirection = target.Position.DirectionTo(pos);
 		Vector3 forceVector = forceDirection * forceMagnitude;
 		
-		//target.AddConstantForce(forceVector);
+		target.AddConstantForce(forceVector);
 	}
 }
