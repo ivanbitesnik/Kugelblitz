@@ -29,7 +29,8 @@ public partial class Player : CharacterBody3D
 	public override void _EnterTree()
 	{
 		SetMultiplayerAuthority(GetId());
-		string contextString = IsServer() ? "Server" : "Client";
+
+		string contextString = Multiplayer.IsServer() ? "Server" : "Client";
 		GD.Print("Character spawned, ID: ", Name, ", Context: ", contextString);
 	}
 
@@ -41,6 +42,9 @@ public partial class Player : CharacterBody3D
 		GetNode<MeshInstance3D>("PlayerMesh").SetSurfaceOverrideMaterial(0, colorMaterial);
 
 		SetAxisLock(PhysicsServer3D.BodyAxis.LinearY, true);
+
+		SetPhysicsProcess(IsMultiplayerAuthority());
+		SetProcessInput(IsMultiplayerAuthority());
     }
 
     private void CalculateVelocity(double delta, Vector3 direction)
@@ -93,8 +97,6 @@ public partial class Player : CharacterBody3D
 	
 	public override void _PhysicsProcess(double delta)
 	{
-		if (!IsMultiplayerAuthority()) return;
-
 		// Add the gravity.
 		if (!IsOnFloor())
 		{

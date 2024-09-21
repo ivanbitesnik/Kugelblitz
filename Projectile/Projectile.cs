@@ -1,6 +1,5 @@
 using Godot;
 using System;
-using Kugelblitz.GravityHandler;
 
 public partial class Projectile : RigidBody3D
 {
@@ -18,6 +17,7 @@ public partial class Projectile : RigidBody3D
 	public override void _Ready()
 	{
 		SetAxisLock(PhysicsServer3D.BodyAxis.LinearY, true);
+		SetAxisLock(PhysicsServer3D.BodyAxis.AngularY, true);
 
 		Graviton = GetTree().Root.GetNode<Graviton>("World/Arena/Graviton");
 	}
