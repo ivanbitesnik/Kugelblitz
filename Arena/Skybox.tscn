@@ -1,0 +1,3 @@
+[gd_scene format=3 uid="uid://da3vkhe0h6y66"]
+
+[node name="Skybox" type="Node3D"]

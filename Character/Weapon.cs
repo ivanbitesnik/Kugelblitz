@@ -40,7 +40,7 @@ public partial class Weapon : StaticBody3D
 		return true;
 	}
 	
-	[Rpc(CallLocal = true)]
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
 	private void FireProjectile()
 	{
 		Projectile projectile = (Projectile)projectileScene.Instantiate();

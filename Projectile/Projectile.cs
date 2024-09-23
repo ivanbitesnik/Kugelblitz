@@ -10,14 +10,13 @@ public partial class Projectile : RigidBody3D
 	public void Initialize(Vector3 position, Vector3 direction, float speed)
 	{
 		Position = position;
-		SetLinearVelocity(new Vector3(direction[0] * speed, 0.0f, direction[2] * speed));
+		SetLinearVelocity(new Vector3(direction.X * speed, 0.0f, direction.Z * speed));
 	}
 	
 	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
 		SetAxisLock(PhysicsServer3D.BodyAxis.LinearY, true);
-		SetAxisLock(PhysicsServer3D.BodyAxis.AngularY, true);
 
 		Graviton = GetTree().Root.GetNode<Graviton>("World/Arena/Graviton");
 	}
@@ -28,7 +27,7 @@ public partial class Projectile : RigidBody3D
 		float DistanceToGraviton = Position.DistanceTo(Graviton.Position);
 		if (DistanceToGraviton <= Graviton.GetInfluenceRange())
 		{
-			Vector3 PullForce = Position.DirectionTo(Graviton.Position) * Graviton.GetIntensity();
+			Vector3 PullForce = Position.DirectionTo(Graviton.Position) * Graviton.GetIntensity() * (1.0f / DistanceToGraviton);
 			ApplyForce(PullForce);
 		}
 	}

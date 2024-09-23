@@ -153,7 +153,6 @@ public partial class Player : CharacterBody3D
 
 		PhysicsRayQueryParameters3D queryParams = PhysicsRayQueryParameters3D.Create(rayOrigin, rayEnd);
 		Godot.Collections.Dictionary hit = spaceState.IntersectRay(queryParams);
-
 		if (hit.Count != 0)
 		{
 			Vector3 hitPos = (Vector3)hit["position"];
