@@ -19,6 +19,7 @@ properties/1/spawn = true
 properties/1/replication_mode = 1
 
 [node name="Projectile" type="RigidBody3D"]
+collision_layer = 2
 mass = 10.0
 script = ExtResource("1_ww0lx")
 
@@ -30,3 +31,5 @@ mesh = SubResource("SphereMesh_5txh7")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
 replication_config = SubResource("SceneReplicationConfig_xxihj")
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]

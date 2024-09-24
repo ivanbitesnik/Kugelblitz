@@ -14,6 +14,8 @@ public partial class Player : CharacterBody3D
 	[Export] private float ParryCooldown = 1.0f;
 	[Export] Color PlayerOneColor = new Color(1.0f, 0.0f, 0.0f);
 	[Export] Color PlayerTwoColor = new Color(0.0f, 0.0f, 1.0f);
+	
+	public Color PlayerColor { get; set; }
 
 	private float DashTimeLeft = 0.0f;
 	private float DashCooldownLeft = 0.0f;
