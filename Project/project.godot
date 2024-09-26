@@ -12,6 +12,7 @@ config_version=5
 
 config/name="Kugelblitz"
 run/main_scene="res://Levels/menu.tscn"
+config/auto_accept_quit=false
 config/features=PackedStringArray("4.3", "C#", "GL Compatibility")
 config/icon="res://icon.svg"
 

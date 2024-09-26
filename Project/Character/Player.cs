@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Linq;
 using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
 
 public partial class Player : CharacterBody3D
 {
@@ -15,26 +16,19 @@ public partial class Player : CharacterBody3D
 	[Export] Color PlayerOneColor = new Color(1.0f, 0.0f, 0.0f);
 	[Export] Color PlayerTwoColor = new Color(0.0f, 0.0f, 1.0f);
 	
-	public Color PlayerColor { get; set; }
-
 	private float DashTimeLeft = 0.0f;
 	private float DashCooldownLeft = 0.0f;
 	private float ParryTimeLeft = 0.0f;
 	private float ParryCooldownLeft = 0.0f;
-	
-	public int GetId()
-	{
-		return int.Parse(Name);
-	}
 
 	public bool IsServer()
 	{
-		return GetId() == 1;
+		return int.Parse(Name) == 1;
 	}
 
 	public override void _EnterTree()
 	{
-		SetMultiplayerAuthority(GetId());
+		SetMultiplayerAuthority(int.Parse(Name));
 
 		string contextString = Multiplayer.IsServer() ? "Server" : "Client";
 		GD.Print("Character spawned, ID: ", Name, ", Context: ", contextString);

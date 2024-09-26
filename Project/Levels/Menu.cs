@@ -24,7 +24,7 @@ public partial class Menu : Node
 	{
 		string contextString = Multiplayer.IsServer() ? "Server" : "Client";
 		GD.Print("Peer connected, ID: ", id.ToString(), ", Context: ", contextString);
-
+		
 		TravelToWorld();
 	}
 
@@ -82,5 +82,14 @@ public partial class Menu : Node
 	private void TravelToWorld()
 	{
 		GetTree().ChangeSceneToPacked(WorldScene);
+	}
+
+	public override void _Notification(int what)
+	{
+    	if (what == NotificationWMCloseRequest)
+		{
+			Multiplayer.MultiplayerPeer = null;
+        	GetTree().Quit(); // default behavior
+		}
 	}
 }

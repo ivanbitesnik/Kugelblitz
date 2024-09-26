@@ -58,9 +58,10 @@ public partial class World : Node3D
 		SpawnPlayer(1);		// Server player
 		SpawnPlayer(id);	// Client player
 	}
+
 	private void SpawnPlayer(long id)
 	{
-		var playerInstance = PlayerScene.Instantiate();
+		Node playerInstance = PlayerScene.Instantiate();
 		playerInstance.Name = id.ToString();
 		AddChild(playerInstance, true);
 	}
@@ -68,6 +69,15 @@ public partial class World : Node3D
 	private void TravelToMenu()
 	{
 		Multiplayer.MultiplayerPeer.Close();
+		Multiplayer.MultiplayerPeer = null;
 		GetTree().ChangeSceneToPacked(MenuScene);
+	}
+
+	public override void _Notification(int what)
+	{
+    	if (what == NotificationWMCloseRequest)
+		{
+        	GetTree().Quit(); // default behavior
+		}
 	}
 }

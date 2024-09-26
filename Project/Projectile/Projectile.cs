@@ -6,7 +6,7 @@ public partial class Projectile : RigidBody3D
 	[Export] private float Intensity;
 	
 	private Graviton Graviton;
-
+	
 	public void Initialize(Vector3 position, Vector3 direction, float speed)
 	{
 		Position = position;
@@ -30,15 +30,12 @@ public partial class Projectile : RigidBody3D
 		{
 			Vector3 pullForce = Position.DirectionTo(Graviton.Position) * Graviton.GetIntensity() * (1.0f / distanceToGraviton);
 			ApplyForce(pullForce);
-			
 		}
-		
 	}
 
 	private void _on_body_entered(Node body)
 	{
 		GD.Print(body.Name);
-		QueueFree();	
+		QueueFree();
 	}
-	
 }
