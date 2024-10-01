@@ -4,11 +4,10 @@
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_tmvjn"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qysp3"]
-albedo_color = Color(1, 0, 0, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hcjxv"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_5txh7"]
-material = SubResource("StandardMaterial3D_qysp3")
+material = SubResource("StandardMaterial3D_hcjxv")
 
 [sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_xxihj"]
 properties/0/path = NodePath(".:position")

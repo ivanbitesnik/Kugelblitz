@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using Kugelblitz.Character;
 
 public partial class World : Node3D
 {
@@ -61,8 +62,9 @@ public partial class World : Node3D
 
 	private void SpawnPlayer(long id)
 	{
-		Node playerInstance = PlayerScene.Instantiate();
+		Player playerInstance = (Player)PlayerScene.Instantiate();
 		playerInstance.Name = id.ToString();
+
 		AddChild(playerInstance, true);
 	}
 

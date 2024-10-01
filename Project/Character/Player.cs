@@ -4,7 +4,9 @@ using System.Linq;
 using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 
-public partial class Player : CharacterBody3D
+namespace Kugelblitz.Character
+{
+	public partial class Player : CharacterBody3D
 {
 	public const float Speed = 5.0f;
 	[Export] private bool IsShootingOn = true;
@@ -13,8 +15,8 @@ public partial class Player : CharacterBody3D
 	[Export] private float DashCooldown = 1.0f;
 	[Export] private float ParryDuration = 0.1f;
 	[Export] private float ParryCooldown = 1.0f;
-	[Export] Color PlayerOneColor = new Color(1.0f, 0.0f, 0.0f);
-	[Export] Color PlayerTwoColor = new Color(0.0f, 0.0f, 1.0f);
+	public Color Color;
+	
 	
 	private float DashTimeLeft = 0.0f;
 	private float DashCooldownLeft = 0.0f;
@@ -29,18 +31,19 @@ public partial class Player : CharacterBody3D
 	public override void _EnterTree()
 	{
 		SetMultiplayerAuthority(int.Parse(Name));
-
 		string contextString = Multiplayer.IsServer() ? "Server" : "Client";
 		GD.Print("Character spawned, ID: ", Name, ", Context: ", contextString);
+		
+		Position = IsServer() ? GetTree().Root.GetNode<Marker3D>("World/Arena/PlayerOneSpawnPoint").Position : GetTree().Root.GetNode<Marker3D>("World/Arena/PlayerTwoSpawnPoint").Position;
+        
+		Color = IsServer() ? Colors.Blue : Colors.Green;
+		GetNode<MeshInstance3D>("PlayerMesh")
+			.SetSurfaceOverrideMaterial(0, new StandardMaterial3D() { AlbedoColor = Color });
 	}
 
     public override void _Ready()
     {
-        Position = IsServer() ? GetTree().Root.GetNode<Marker3D>("World/Arena/PlayerOneSpawnPoint").Position : GetTree().Root.GetNode<Marker3D>("World/Arena/PlayerTwoSpawnPoint").Position;
-
-		StandardMaterial3D colorMaterial = new StandardMaterial3D() { AlbedoColor = IsServer() ? PlayerOneColor : PlayerTwoColor };
-		GetNode<MeshInstance3D>("PlayerMesh").SetSurfaceOverrideMaterial(0, colorMaterial);
-
+	    
 		SetAxisLock(PhysicsServer3D.BodyAxis.LinearY, true);
 
 		SetPhysicsProcess(IsMultiplayerAuthority());
@@ -202,4 +205,7 @@ public partial class Player : CharacterBody3D
 	{
 		return ParryCooldownLeft > 0.0f;
 	}
+	
+}
+
 }

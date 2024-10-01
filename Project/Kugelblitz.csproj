@@ -7,8 +7,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="Character\player.tscn" />
-    <Content Include="Connection\Connection.tscn" />
     <Content Include="Projectile\projectile.tscn" />
-    <Content Include="World\world.tscn" />
   </ItemGroup>
 </Project>
