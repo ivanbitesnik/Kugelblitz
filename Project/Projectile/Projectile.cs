@@ -6,13 +6,14 @@ public partial class Projectile : RigidBody3D
 {
 	[Export] private float Intensity;
 	private Color Color;
-	
+	[Export] private float Damage;
 	private Graviton Graviton;
 	
 	public void Initialize(Vector3 position, Vector3 direction, float speed, Color color)
 	{
 		Color = color;
 		Position = position;
+		Damage = 25.0f;
 		SetLinearVelocity(new Vector3(direction.X * speed, 0.0f, direction.Z * speed));
 	}
 	
@@ -41,6 +42,9 @@ public partial class Projectile : RigidBody3D
 	private void _on_body_entered(Node body)
 	{
 		GD.Print(body.Name);
+		var player = body as Player;
+		if (player is not null) player.DealDamage(Damage);
+		
 		QueueFree();
 	}
 	

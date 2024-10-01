@@ -16,6 +16,7 @@ namespace Kugelblitz.Character
 	[Export] private float ParryDuration = 0.1f;
 	[Export] private float ParryCooldown = 1.0f;
 	public Color Color;
+	private float Health;
 	
 	
 	private float DashTimeLeft = 0.0f;
@@ -39,6 +40,8 @@ namespace Kugelblitz.Character
 		Color = IsServer() ? Colors.Blue : Colors.Green;
 		GetNode<MeshInstance3D>("PlayerMesh")
 			.SetSurfaceOverrideMaterial(0, new StandardMaterial3D() { AlbedoColor = Color });
+
+		Health = 100.0f;
 	}
 
 	public override void _ExitTree()
@@ -208,6 +211,12 @@ namespace Kugelblitz.Character
 	public bool IsParryOnCooldown()
 	{
 		return ParryCooldownLeft > 0.0f;
+	}
+
+	public void DealDamage(float damage)
+	{
+		Health -= damage;
+		if (Health <= 0) QueueFree();
 	}
 	
 }
