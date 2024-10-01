@@ -18,6 +18,10 @@ public partial class Graviton : RigidBody3D
 		SetFreezeMode(FreezeModeEnum.Static);
 	}
 
+	public override void _ExitTree()
+	{
+		QueueFree();
+	}
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{

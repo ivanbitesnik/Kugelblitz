@@ -41,6 +41,10 @@ namespace Kugelblitz.Character
 			.SetSurfaceOverrideMaterial(0, new StandardMaterial3D() { AlbedoColor = Color });
 	}
 
+	public override void _ExitTree()
+	{
+		QueueFree();
+	}
     public override void _Ready()
     {
 	    

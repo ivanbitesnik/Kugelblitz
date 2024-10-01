@@ -50,7 +50,7 @@ public partial class World : Node3D
 	private void ServerDisconnected()
 	{
 		GD.Print("Server disconnected");
-
+		QueueFree();
 		TravelToMenu();
 	}
 
