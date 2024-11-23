@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3 uid="uid://b5d5ci2xama1h"]
+
+[ext_resource type="Script" path="res://Debug/Printdebug.cs" id="1_tp1sb"]
+
+[node name="Printdebug" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_tp1sb")
+
+[connection signal="draw" from="." to="." method="_on_draw"]

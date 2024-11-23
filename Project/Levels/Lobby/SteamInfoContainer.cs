@@ -19,7 +19,9 @@ public partial class SteamInfoContainer : CanvasLayer
 	public override void _Ready()
 	{	
 		SteamInitResult result = SteamStatic.SteamInit();
-		GD.Print("Steam init result: ", result.Status.ToString());
+		string steamInitResult = "Steam init result: " + result.Status.ToString();
+		GD.Print(steamInitResult);
+		DebugManager.PrintString(this, steamInitResult, 10.0f); 
 	}
 
     public override void _Process(double delta)

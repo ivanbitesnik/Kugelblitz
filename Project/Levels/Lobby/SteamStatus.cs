@@ -13,9 +13,9 @@ public partial class SteamStatus : PanelContainer
 
 	public override void _Ready()
 	{
-		//bool bSteamRunning = SteamStatic.IsSteamRunning();
-		//
-		//Modulate = bSteamRunning ? Colors.Green : Colors.Red;
+		bool bSteamRunning = SteamStatic.IsSteamRunning();
+		
+		Modulate = bSteamRunning ? Colors.Green : Colors.Red;
 		//Status.Text = bSteamRunning ? "Steam is running" : "Steam is not running";
 	}
 }

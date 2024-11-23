@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3 uid="uid://dlqoa5y6jtlre"]
+[gd_scene load_steps=4 format=3 uid="uid://dlqoa5y6jtlre"]
 
 [ext_resource type="Script" path="res://Levels/Lobby/Menu.cs" id="1_wunnt"]
 [ext_resource type="PackedScene" uid="uid://x0m4xoliogv0" path="res://Levels/Lobby/SteamInfoContainer.tscn" id="2_5q3ry"]
+[ext_resource type="PackedScene" uid="uid://b5d5ci2xama1h" path="res://Debug/printdebug.tscn" id="3_v6rxo"]
 
 [node name="Menu" type="Node"]
 script = ExtResource("1_wunnt")
@@ -56,6 +57,8 @@ offset_top = 0.239998
 offset_right = 0.0
 offset_bottom = -0.160034
 grow_horizontal = 0
+
+[node name="Printdebug" parent="." instance=ExtResource("3_v6rxo")]
 
 [connection signal="pressed" from="CenterContainer/VBoxContainer/Host" to="." method="_on_host_pressed"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/Join" to="." method="_on_join_pressed"]
