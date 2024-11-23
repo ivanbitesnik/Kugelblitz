@@ -51,5 +51,7 @@ public partial class Weapon : StaticBody3D
 		Vector3 muzzlePos = GetNode<Marker3D>("Muzzle").GlobalPosition + (direction * 3.0f);
 		projectile.Initialize(muzzlePos, direction, ProjectileSpeed, ProjectileColor);
 		GetTree().Root.AddChild(projectile);
+
+		projectile.SetMultiplayerAuthority(GetParent<Player>().GetPlayerId());
 	}
 }

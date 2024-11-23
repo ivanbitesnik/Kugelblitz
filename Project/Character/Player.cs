@@ -16,7 +16,7 @@ namespace Kugelblitz.Character
 	[Export] private float ParryDuration = 0.1f;
 	[Export] private float ParryCooldown = 1.0f;
 	public Color Color;
-	private float Health;
+	private float Health = 100.0f;
 	
 	
 	private float DashTimeLeft = 0.0f;
@@ -26,12 +26,17 @@ namespace Kugelblitz.Character
 
 	public bool IsServer()
 	{
-		return int.Parse(Name) == 1;
+		return GetPlayerId() == 1;
+	}
+
+	public int GetPlayerId()
+	{
+		return int.Parse(Name);
 	}
 
 	public override void _EnterTree()
 	{
-		SetMultiplayerAuthority(int.Parse(Name));
+		SetMultiplayerAuthority(GetPlayerId());
 		string contextString = Multiplayer.IsServer() ? "Server" : "Client";
 		GD.Print("Character spawned, ID: ", Name, ", Context: ", contextString);
 		
@@ -40,17 +45,15 @@ namespace Kugelblitz.Character
 		Color = IsServer() ? Colors.Blue : Colors.Green;
 		GetNode<MeshInstance3D>("PlayerMesh")
 			.SetSurfaceOverrideMaterial(0, new StandardMaterial3D() { AlbedoColor = Color });
-
-		Health = 100.0f;
 	}
 
 	public override void _ExitTree()
 	{
 		QueueFree();
 	}
+
     public override void _Ready()
     {
-	    
 		SetAxisLock(PhysicsServer3D.BodyAxis.LinearY, true);
 
 		SetPhysicsProcess(IsMultiplayerAuthority());
@@ -118,6 +121,10 @@ namespace Kugelblitz.Character
 		if (IsParrying())
 		{
 			ParryTimeLeft = (float)Mathf.Clamp(ParryTimeLeft - delta, 0.0f, ParryTimeLeft);
+			if (!IsParrying())
+			{
+				Rpc(nameof(EndParry));
+			}
 		}
 		else if (IsParryOnCooldown())
 		{
@@ -144,7 +151,7 @@ namespace Kugelblitz.Character
 		{
 			if (!IsParryOnCooldown())
 			{
-				StartParrying();
+				Rpc(nameof(StartParrying));
 			}
 		}
 	}
@@ -172,10 +179,22 @@ namespace Kugelblitz.Character
 		DashCooldownLeft = DashCooldown;
 	}
 
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
 	private void StartParrying()
 	{
 		ParryTimeLeft = ParryDuration;
 		ParryCooldownLeft = ParryCooldown;
+
+		GetNode<MeshInstance3D>("PlayerMesh")
+			.SetSurfaceOverrideMaterial(0, new StandardMaterial3D() { AlbedoColor = Colors.Gray });
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+	private void EndParry()
+	{
+		ParryTimeLeft = 0.0f;
+		GetNode<MeshInstance3D>("PlayerMesh")
+					.SetSurfaceOverrideMaterial(0, new StandardMaterial3D() { AlbedoColor = Color });
 	}
 
 	private void TryFire()
@@ -216,9 +235,17 @@ namespace Kugelblitz.Character
 	public void DealDamage(float damage)
 	{
 		Health -= damage;
-		if (Health <= 0) QueueFree();
+		if (Health <= 0)
+		{
+			Rpc(nameof(OnPlayerDead));
+		}
 	}
-	
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+	private void OnPlayerDead()
+	{
+		QueueFree();
+	}
 }
 
 }

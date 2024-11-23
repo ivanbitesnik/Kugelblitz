@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3 uid="uid://dmlt6mw18dl5h"]
+
+[ext_resource type="Script" path="res://Levels/Lobby/FriendItem.cs" id="1_47071"]
+
+[node name="FriendItem" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="PanelContainer" type="PanelContainer" parent="."]
+layout_mode = 1
+offset_right = 338.0
+offset_bottom = 50.0
+script = ExtResource("1_47071")

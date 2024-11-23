@@ -19,10 +19,12 @@ public partial class Projectile : RigidBody3D
 	
 	public override void _Ready()
 	{
+		SetMultiplayerAuthority(1, false);
+
 		GetNode<MeshInstance3D>("MeshInstance3D").SetSurfaceOverrideMaterial(0, new StandardMaterial3D() { AlbedoColor = Color});
 		
 		ContactMonitor = true;
-		MaxContactsReported = 1; //Bullet should be deleted on first collision??? How does parry work
+		MaxContactsReported = 1;
 		
 		SetAxisLock(PhysicsServer3D.BodyAxis.LinearY, true);
 		Graviton = GetTree().Root.GetNode<Graviton>("World/Arena/Graviton");
@@ -41,11 +43,27 @@ public partial class Projectile : RigidBody3D
 
 	private void _on_body_entered(Node body)
 	{
-		GD.Print(body.Name);
-		var player = body as Player;
-		if (player is not null) player.DealDamage(Damage);
+		if (!IsMultiplayerAuthority()) return;
 		
+		GD.Print("Bullet hit: ", body.Name, " Context: ", Multiplayer.GetUniqueId() == 1 ? "Server" : "Client");
+		
+		var player = body as Player;
+		if (player is not null)
+		{
+			if (player.IsParrying())
+			{
+				return;
+			}
+
+			player.DealDamage(Damage);
+		}
+
+		Rpc(nameof(HandleImpact));
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+	private void HandleImpact()
+	{	
 		QueueFree();
 	}
-	
 }

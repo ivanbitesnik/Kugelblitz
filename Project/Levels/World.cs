@@ -4,7 +4,7 @@ using Kugelblitz.Character;
 
 public partial class World : Node3D
 {
-	private PackedScene MenuScene = GD.Load<PackedScene>("res://Levels/menu.tscn");
+	private PackedScene MenuScene = GD.Load<PackedScene>("res://Levels/Lobby/menu.tscn");
 
 	[Export] private PackedScene PlayerScene;
 

@@ -10,13 +10,17 @@ public partial class Menu : Node
 
 	private CenterContainer Hud;
 	private LineEdit IPField;
+	private Node SteamInfoContainer;
 
 	public override void _Ready()
 	{
 		SetMultiplayerAuthority(1);
-
+		
 		IPField = GetNode<LineEdit>("CenterContainer/VBoxContainer/HBoxContainer/LineEdit");
 		Hud = GetNode<CenterContainer>("CenterContainer");
+		SteamInfoContainer = GetNode<Control>("SteamInfoContainer");
+
+		SteamInfoContainer.GetNode<CanvasLayer>("Container").Hide();
 	}
 
 	// Called by client for the present server and called by server for connected client
@@ -53,6 +57,7 @@ public partial class Menu : Node
 		GD.Print("Waiting for players...");
 
 		Hud.Hide();
+		SteamInfoContainer.GetNode<CanvasLayer>("Container").Hide();
 	}
 
 	private void _on_join_pressed()
