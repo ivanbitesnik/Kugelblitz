@@ -4,12 +4,13 @@ using System;
 
 public partial class FriendItem : PanelContainer
 {
-	[Export] public Panel PlayerStatus;
-	[Export] public Label PlayerName;
-	[Export] public Label PlayerLevel;
+	public Panel PlayerStatus = new Panel();
+	public Label PlayerName = new Label();
+	public Label PlayerLevel = new Label();
 
 	public void SetFriendAndLevel(Friend friend, int level)
 	{
+		PlayerName.SetSize(GetParent<Control>().Size);
 		PlayerName.Text = friend.Name;
 		PlayerLevel.Text = "Level " + level;
 

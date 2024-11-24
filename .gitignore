@@ -1,6 +1,7 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
-/Build/*
+/Builds/Linux64/*
+/Builds/Windows/*
 .idea/
 /Project/*.user

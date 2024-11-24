@@ -30,9 +30,9 @@ public partial class FriendList : GridContainer
 
 	private void AddFriend(Friend friend)
 	{
-		var friendLevel = SteamStatic.GetFriendSteamLevel(friend.Id);
+		int friendLevel = SteamStatic.GetFriendSteamLevel(friend.Id);
 		
-		var newFriendItem = FriendItem.Instantiate<FriendItem>();
+		FriendItem newFriendItem = FriendItem.Instantiate<FriendItem>();
 		newFriendItem.SetFriendAndLevel(friend, friendLevel);
 			
 		AddChild(newFriendItem);
