@@ -11,7 +11,7 @@ public partial class SteamInfoContainer : Control
 	public SteamStatus SteamStatus;
 	public FriendList FriendList;
 
-	[Export] public float SteamStatusSize = 75.0f;
+	[Export] public float SteamStatusHeight = 75.0f;
 
 	public override void _EnterTree()
 	{
@@ -27,11 +27,12 @@ public partial class SteamInfoContainer : Control
 		DebugManager.PrintString(this, steamInitResult, 10.0f);
 
 		SteamStatus = new SteamStatus();
-		SteamStatus.SetSize(new Vector2(Size.X, SteamStatusSize));
+		SteamStatus.SetSize(new Vector2(Size.X, SteamStatusHeight));
 		AddChild(SteamStatus);
 
 		FriendList = new FriendList();
-		FriendList.SetSize(new Vector2(Size.X, Size.Y - SteamStatusSize));
+		FriendList.FriendItemHeight = SteamStatusHeight;
+		FriendList.SetSize(new Vector2(Size.X, Size.Y - SteamStatusHeight));
 		AddChild(FriendList);
 	}
 

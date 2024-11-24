@@ -4,7 +4,8 @@ using System;
 
 public partial class FriendList : GridContainer
 {
-	[Export] public PackedScene FriendItem;
+	public PackedScene FriendItem;
+	public float FriendItemHeight;
 
 	public override void _Ready()
 	{
@@ -16,6 +17,7 @@ public partial class FriendList : GridContainer
 		
 		foreach (var friend in friendsList)
 		{
+			DebugManager.PrintString(this, friend.Name, 10.0f);
 			AddFriend(friend);
 		}
 	}
@@ -33,6 +35,7 @@ public partial class FriendList : GridContainer
 		int friendLevel = SteamStatic.GetFriendSteamLevel(friend.Id);
 		
 		FriendItem newFriendItem = FriendItem.Instantiate<FriendItem>();
+		newFriendItem.SetSize(new Vector2(Size.X, FriendItemHeight));
 		newFriendItem.SetFriendAndLevel(friend, friendLevel);
 			
 		AddChild(newFriendItem);

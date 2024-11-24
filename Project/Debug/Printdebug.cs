@@ -1,10 +1,11 @@
 using Godot;
+using Microsoft.VisualBasic;
 using System;
 
 public partial class Printdebug : Control
 {
-	public double DebugDurationLeft = 0.0f;
-	public string currentDebugString = "";
+	public Godot.Collections.Dictionary<string, double> currentDebugDurations = new Godot.Collections.Dictionary<string, double>();
+	public Godot.Collections.Dictionary<string, double> currentDebugTimestamps = new Godot.Collections.Dictionary<string, double>();
 	[Export] private Font font = ThemeDB.FallbackFont;
 	[Export] private Vector2 drawPos = new Vector2(20.0f, 50.0f);
 	
@@ -16,25 +17,35 @@ public partial class Printdebug : Control
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
-		DebugDurationLeft -= delta;
-		if (DebugDurationLeft < 0.0f)
+		foreach (var debugString in currentDebugTimestamps)
 		{
-			DebugDurationLeft = 0.0f;
-			currentDebugString = "";
-			QueueRedraw();
+			double duration = currentDebugDurations[debugString.Key];
+			if (Time.GetUnixTimeFromSystem() - debugString.Value >= duration)
+			{
+				currentDebugTimestamps.Remove(debugString.Key);
+				currentDebugDurations.Remove(debugString.Key);
+				QueueRedraw();
+			}
 		}
 	}
 
 	public void PrintString(string String, double Duration)
 	{
-		currentDebugString = String;
-		DebugDurationLeft = Duration;
+		currentDebugTimestamps.Add(String, Time.GetUnixTimeFromSystem());
+		currentDebugDurations.Add(String, Duration);
 
 		QueueRedraw();
 	}
 
 	public void _on_draw()
 	{
-		DrawString(font, drawPos, currentDebugString, HorizontalAlignment.Left, 1920.0f, 15);
+		float verticalPos = drawPos.Y;
+		foreach (var debugString in currentDebugTimestamps)
+		{
+			Vector2 pos = new Vector2(drawPos.X, verticalPos);
+			DrawString(font, pos, debugString.Key, HorizontalAlignment.Left, 1920.0f, 15);
+
+			verticalPos += 15.0f;
+		}
 	}
 }
