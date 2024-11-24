@@ -4,19 +4,26 @@ using System;
 
 public partial class FriendItem : PanelContainer
 {
+	public HBoxContainer HorizontalContainer = new HBoxContainer();
 	public Panel PlayerStatus = new Panel();
 	public Label PlayerName = new Label();
-	public Label PlayerLevel = new Label();
 
-	public void SetFriendAndLevel(Friend friend, int level)
+	public void SetFriend(Friend friend)
 	{
-		PlayerName.SetSize(GetParent<Control>().Size);
-		PlayerName.Text = friend.Name;
-		PlayerLevel.Text = "Level " + level;
+		HorizontalContainer.SetSize(Size);
+		HorizontalContainer.SizeFlagsHorizontal = SizeFlags.Fill;
+		HorizontalContainer.ClipChildren = ClipChildrenMode.Disabled;
+		AddChild(HorizontalContainer);
 
-		var stylebox = (StyleBoxFlat)PlayerStatus.GetThemeStylebox("panel").Duplicate();
+		PlayerName.SetSize(Size);
+		PlayerName.Text = friend.Name;
+		PlayerName.HorizontalAlignment = HorizontalAlignment.Left;
+		AddChild(PlayerName);
+
+		var stylebox = new StyleBoxFlat();
 		stylebox.BgColor = GetStatusColor(friend.Status);
 		PlayerStatus.AddThemeStyleboxOverride("panel", stylebox);
+		HorizontalContainer.AddChild(PlayerStatus);
 	}
 
 	private Color GetStatusColor(PersonaState personaState)

@@ -4,12 +4,18 @@ using System;
 
 public partial class FriendList : GridContainer
 {
+	public VBoxContainer VerticalContainer = new VBoxContainer();
 	public PackedScene FriendItem;
 	public float FriendItemHeight;
 
 	public override void _Ready()
 	{
 		if (!SteamStatic.IsSteamRunning()) return;
+
+		VerticalContainer.SetSize(Size);
+		VerticalContainer.SizeFlagsHorizontal = SizeFlags.Expand;
+		VerticalContainer.ClipChildren = ClipChildrenMode.Disabled;
+		AddChild(VerticalContainer);
 		
 		var friendsList = SteamStatic.GetUserSteamFriends();
 
@@ -17,14 +23,13 @@ public partial class FriendList : GridContainer
 		
 		foreach (var friend in friendsList)
 		{
-			DebugManager.PrintString(this, friend.Name, 10.0f);
 			AddFriend(friend);
 		}
 	}
 
 	private void ClearList()
 	{
-		foreach (var child in GetChildren())
+		foreach (var child in VerticalContainer.GetChildren())
 		{
 			child.QueueFree();
 		}
@@ -34,10 +39,10 @@ public partial class FriendList : GridContainer
 	{
 		int friendLevel = SteamStatic.GetFriendSteamLevel(friend.Id);
 		
-		FriendItem newFriendItem = FriendItem.Instantiate<FriendItem>();
+		FriendItem newFriendItem = new FriendItem();
 		newFriendItem.SetSize(new Vector2(Size.X, FriendItemHeight));
-		newFriendItem.SetFriendAndLevel(friend, friendLevel);
+		newFriendItem.SetFriend(friend);
 			
-		AddChild(newFriendItem);
+		VerticalContainer.AddChild(newFriendItem);
 	}
 }
