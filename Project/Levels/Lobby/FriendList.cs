@@ -2,19 +2,21 @@ using Godot;
 using GodotSteam;
 using System;
 
-public partial class FriendList : GridContainer
+public partial class FriendList : ScrollContainer
 {
 	public VBoxContainer VerticalContainer = new VBoxContainer();
-	public PackedScene FriendItem;
 	public float FriendItemHeight;
 
-	public override void _Ready()
+	public override async void _Ready()
 	{
 		if (!SteamStatic.IsSteamRunning()) return;
 
-		VerticalContainer.SetSize(Size);
-		VerticalContainer.SizeFlagsHorizontal = SizeFlags.Expand;
-		VerticalContainer.ClipChildren = ClipChildrenMode.Disabled;
+		VerticalScrollMode = ScrollMode.ShowAlways;
+		HorizontalScrollMode = ScrollMode.Disabled;
+		SizeFlagsVertical = SizeFlags.ExpandFill;
+		SizeFlagsHorizontal = SizeFlags.Fill;
+		VerticalContainer.SizeFlagsVertical = SizeFlags.ExpandFill;
+		VerticalContainer.SizeFlagsHorizontal = SizeFlags.ExpandFill;
 		AddChild(VerticalContainer);
 		
 		var friendsList = SteamStatic.GetUserSteamFriends();
@@ -35,13 +37,13 @@ public partial class FriendList : GridContainer
 		}
 	}
 
+	bool colorpick = false;
 	private void AddFriend(Friend friend)
 	{
-		int friendLevel = SteamStatic.GetFriendSteamLevel(friend.Id);
-		
 		FriendItem newFriendItem = new FriendItem();
-		newFriendItem.SetSize(new Vector2(Size.X, FriendItemHeight));
 		newFriendItem.SetFriend(friend);
+		newFriendItem.Modulate = colorpick ? Colors.Yellow : Colors.Blue;
+		colorpick = !colorpick;
 			
 		VerticalContainer.AddChild(newFriendItem);
 	}

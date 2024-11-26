@@ -2,14 +2,12 @@
 
 [ext_resource type="Script" path="res://Levels/Lobby/SteamInfoContainer.cs" id="1_t6djm"]
 
-[node name="SteamInfoContainer" type="Control"]
-layout_mode = 3
+[node name="SteamInfoContainer" type="VBoxContainer"]
+anchors_preset = -1
 anchor_right = 0.313
 anchor_bottom = 0.694
-offset_left = 742.0
-offset_top = 60.0
-offset_right = 741.96
-offset_bottom = 60.32
+offset_right = -0.039978
+offset_bottom = 0.320007
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_t6djm")

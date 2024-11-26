@@ -1,29 +1,31 @@
 using Godot;
 using GodotSteam;
 using System;
+using System.Runtime.CompilerServices;
 
-public partial class FriendItem : PanelContainer
+public partial class FriendItem : HBoxContainer
 {
-	public HBoxContainer HorizontalContainer = new HBoxContainer();
 	public Panel PlayerStatus = new Panel();
-	public Label PlayerName = new Label();
+	public Button PlayerName = new Button();
+	private Friend FriendInfo;
 
 	public void SetFriend(Friend friend)
 	{
-		HorizontalContainer.SetSize(Size);
-		HorizontalContainer.SizeFlagsHorizontal = SizeFlags.Fill;
-		HorizontalContainer.ClipChildren = ClipChildrenMode.Disabled;
-		AddChild(HorizontalContainer);
+		FriendInfo = friend;
+		SizeFlagsHorizontal = SizeFlags.Fill;
+		SizeFlagsVertical = SizeFlags.Fill;
 
-		PlayerName.SetSize(Size);
 		PlayerName.Text = friend.Name;
-		PlayerName.HorizontalAlignment = HorizontalAlignment.Left;
+		PlayerName.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+		PlayerName.ButtonUp += FriendButtonPressed;
 		AddChild(PlayerName);
 
 		var stylebox = new StyleBoxFlat();
 		stylebox.BgColor = GetStatusColor(friend.Status);
 		PlayerStatus.AddThemeStyleboxOverride("panel", stylebox);
-		HorizontalContainer.AddChild(PlayerStatus);
+		AddChild(PlayerStatus);
+
+		Modulate = Colors.LightGray;
 	}
 
 	private Color GetStatusColor(PersonaState personaState)
@@ -45,5 +47,10 @@ public partial class FriendItem : PanelContainer
 			default:
 				return new Color("#444");
 		}
+	}
+
+	private void FriendButtonPressed()
+	{
+		SteamStatic.InviteUserToGame(FriendInfo.Id, "");
 	}
 }

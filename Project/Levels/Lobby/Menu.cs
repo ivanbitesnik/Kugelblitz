@@ -19,6 +19,7 @@ public partial class Menu : Node
 		IPField = GetNode<LineEdit>("CenterContainer/VBoxContainer/HBoxContainer/LineEdit");
 		Hud = GetNode<CenterContainer>("CenterContainer");
 		SteamInfoContainer = GetNode<Control>("SteamInfoContainer");
+		SteamInfoContainer.Hide();
 	}
 
 	// Called by client for the present server and called by server for connected client
@@ -44,7 +45,7 @@ public partial class Menu : Node
 		IPField.Text = "";
 		IPField.PlaceholderText = "Invalid IP!";
 		Hud.Show();
-		SteamInfoContainer.Show();
+		SteamInfoContainer.Hide();
 	}
 
 	private void _on_host_pressed()
@@ -56,7 +57,7 @@ public partial class Menu : Node
 		GD.Print("Waiting for players...");
 
 		Hud.Hide();
-		SteamInfoContainer.Hide();
+		SteamInfoContainer.Show();
 	}
 
 	private void _on_join_pressed()
@@ -69,6 +70,8 @@ public partial class Menu : Node
 		
 		Multiplayer.ConnectedToServer += ConnectedToServer;
 		Hud.Hide();
+
+		SteamInfoContainer.Hide();
 	}
 
 	private void _on_line_edit_changed(string newText)
