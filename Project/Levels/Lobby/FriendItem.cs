@@ -17,15 +17,10 @@ public partial class FriendItem : HBoxContainer
 
 		PlayerName.Text = friend.Name;
 		PlayerName.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+		PlayerName.Modulate = GetStatusColor(friend.Status);
 		PlayerName.ButtonUp += FriendButtonPressed;
 		AddChild(PlayerName);
 
-		var stylebox = new StyleBoxFlat();
-		stylebox.BgColor = GetStatusColor(friend.Status);
-		PlayerStatus.AddThemeStyleboxOverride("panel", stylebox);
-		AddChild(PlayerStatus);
-
-		Modulate = Colors.LightGray;
 	}
 
 	private Color GetStatusColor(PersonaState personaState)

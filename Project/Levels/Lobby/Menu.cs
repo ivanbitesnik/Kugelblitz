@@ -1,4 +1,5 @@
 using Godot;
+using GodotSteam;
 using System;
 
 public partial class Menu : Node
@@ -11,6 +12,7 @@ public partial class Menu : Node
 	private CenterContainer Hud;
 	private LineEdit IPField;
 	private Control SteamInfoContainer;
+	private ulong lobby_id = 0;
 
 	public override void _Ready()
 	{
@@ -20,6 +22,34 @@ public partial class Menu : Node
 		Hud = GetNode<CenterContainer>("CenterContainer");
 		SteamInfoContainer = GetNode<Control>("SteamInfoContainer");
 		SteamInfoContainer.Hide();
+
+		SteamStatic.InitRelayNetworkAccess();
+    	SteamStatic.LobbyCreated += _on_lobby_created;
+    	SteamStatic.LobbyInvite += _on_lobby_invite;
+    	SteamStatic.LobbyJoined += _on_lobby_joined;
+
+    	CheckCommandLine();
+	}
+
+	private void CheckCommandLine()
+	{
+		var args = OS.GetCmdlineArgs();
+		if (!args.IsEmpty())
+		{
+			if (args[0] == "+connect_lobby")
+			{
+				if (args[1].ToInt() > 0)
+				{
+					JoinLobby((ulong)args[1].ToInt());
+				}
+			}
+		}
+	}
+
+	private void _on_lobby_invite(ulong inviter, ulong lobby, ulong game)
+	{
+		string debugString = "Inviter: " + inviter.ToString() + " lobby: " + lobby.ToString() + " game: " + game.ToString();
+		DebugManager.PrintString(this, debugString, 10.0f);
 	}
 
 	// Called by client for the present server and called by server for connected client
@@ -50,14 +80,41 @@ public partial class Menu : Node
 
 	private void _on_host_pressed()
 	{
-		ENetMultiplayerPeer peer = new ENetMultiplayerPeer();
-		Error err = peer.CreateServer(PORT, 2);
-		Multiplayer.MultiplayerPeer = peer;
+		if (!SteamStatic.IsSteamRunning())
+		{
+			ENetMultiplayerPeer peer = new ENetMultiplayerPeer();
+			Error err = peer.CreateServer(PORT, 2);
+			Multiplayer.MultiplayerPeer = peer;
 
-		GD.Print("Waiting for players...");
+			GD.Print("Waiting for players...");
+			Hud.Hide();
+			SteamInfoContainer.Show();
+			return;
+		}
+
+		if (lobby_id != 0) return;
+
+		SteamStatic.CreateLobby(SteamStatic.LobbyType.Public, 2);
 
 		Hud.Hide();
 		SteamInfoContainer.Show();
+	}
+
+	public void _on_lobby_created(long connect, ulong lobbyId)
+	{
+		if (connect == 1)
+		{
+			lobby_id = lobbyId;
+			string debugString = "Created lobby id:" + lobbyId.ToString();
+			DebugManager.PrintString(this,  debugString, 10.0f);
+
+			SteamStatic.SetLobbyJoinable(lobby_id, true);
+
+			SteamStatic.SetLobbyData(lobby_id, "name", "Lobby");
+			SteamStatic.SetLobbyData(lobby_id, "mode", "Godot steam test");
+
+			SteamStatic.CreateListenSocketP2P(0, new Godot.Collections.Array());
+		}
 	}
 
 	private void _on_join_pressed()
@@ -72,6 +129,23 @@ public partial class Menu : Node
 		Hud.Hide();
 
 		SteamInfoContainer.Hide();
+	}
+
+	private void JoinLobby(ulong lobbyId)
+	{
+		SteamStatic.JoinLobby(lobbyId);
+	}
+
+	private void _on_lobby_joined(ulong lobbyId, long permissions, bool locked, long response)
+	{
+		if (response == 1)
+		{
+			lobby_id = lobbyId;
+			string debugString = "Joined lobby id: " + lobbyId.ToString();
+			DebugManager.PrintString(this, debugString, 10.0f);
+
+			SteamStatic.ConnectP2P(lobbyId, 0, new Godot.Collections.Array());
+		}
 	}
 
 	private void _on_line_edit_changed(string newText)

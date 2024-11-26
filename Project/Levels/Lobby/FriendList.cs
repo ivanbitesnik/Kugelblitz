@@ -1,6 +1,7 @@
 using Godot;
 using GodotSteam;
 using System;
+using System.Collections;
 
 public partial class FriendList : ScrollContainer
 {
@@ -23,10 +24,16 @@ public partial class FriendList : ScrollContainer
 
 		ClearList();
 		
+		friendsList.Sort(CompareFriends);
 		foreach (var friend in friendsList)
 		{
 			AddFriend(friend);
 		}
+	}
+
+	public static int CompareFriends(Friend a, Friend b)
+	{
+		return (int)a.Status;
 	}
 
 	private void ClearList()
@@ -37,13 +44,10 @@ public partial class FriendList : ScrollContainer
 		}
 	}
 
-	bool colorpick = false;
 	private void AddFriend(Friend friend)
 	{
 		FriendItem newFriendItem = new FriendItem();
 		newFriendItem.SetFriend(friend);
-		newFriendItem.Modulate = colorpick ? Colors.Yellow : Colors.Blue;
-		colorpick = !colorpick;
 			
 		VerticalContainer.AddChild(newFriendItem);
 	}

@@ -2,6 +2,5 @@
 .godot/
 /android/
 /Builds/Linux64/*
-/Builds/Windows/*
 .idea/
 /Project/*.user
