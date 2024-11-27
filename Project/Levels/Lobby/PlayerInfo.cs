@@ -21,10 +21,9 @@ public partial class PlayerInfo : PanelContainer
 
 	public override void _Ready()
 	{
-		HorizontalContainer.SizeFlagsHorizontal = SizeFlags.Fill;
 		AddChild(HorizontalContainer);
 
-		PlayerName.SizeFlagsHorizontal = SizeFlags.Expand;
+		PlayerName.SizeFlagsHorizontal = SizeFlags.ExpandFill;
 		if (SteamStatic.IsSteamRunning())
 		{
 			SteamStatic.GetPlayerAvatar();
@@ -48,16 +47,15 @@ public partial class PlayerInfo : PanelContainer
 		stylebox.Texture = ImageTexture.CreateFromImage(avatarImage);
 		
 		PlayerAvatar.AddThemeStyleboxOverride("panel", stylebox);
-		PlayerAvatar.SizeFlagsHorizontal = SizeFlags.Fill;
+		PlayerAvatar.SizeFlagsHorizontal = SizeFlags.ExpandFill;
 		HorizontalContainer.AddChild(PlayerAvatar);
-
-		Modulate = Colors.Green;
 
 		var SteamId = SteamStatic.GetSteamID();
 		var name = SteamStatic.GetFriendPersonaName(SteamId);
 		
-		PlayerName.HorizontalAlignment = HorizontalAlignment.Left;
+		PlayerName.HorizontalAlignment = HorizontalAlignment.Center;
 		PlayerName.Text = name;
+		PlayerName.SizeFlagsStretchRatio = 2.0f;
 		HorizontalContainer.AddChild(PlayerName);
 	}
 }

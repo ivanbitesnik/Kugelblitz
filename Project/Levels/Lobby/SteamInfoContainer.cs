@@ -27,9 +27,11 @@ public partial class SteamInfoContainer : VBoxContainer
 		GD.Print(steamInitResult);
 		DebugManager.PrintString(this, steamInitResult, 10.0f);
 
+		PlayerInfo.SizeFlagsVertical = SizeFlags.ExpandFill;
 		AddChild(PlayerInfo);
 
-		FriendList.FriendItemHeight = FriendItemHeight;
+		FriendList.SizeFlagsVertical = SizeFlags.ExpandFill;
+		FriendList.SizeFlagsStretchRatio = 3.0f;
 		AddChild(FriendList);
 	}
 
