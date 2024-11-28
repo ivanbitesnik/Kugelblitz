@@ -9,9 +9,10 @@ public partial class Menu : Node
 	[Export] private int PORT = 8080;
 	[Export] private string ADDRESS = "127.0.0.1";
 
-	private CenterContainer Hud;
+	private Control Hud;
+	private SteamInfoContainer SteamInfoContainer;
+	private Control LobbyContainer;
 	private LineEdit IPField;
-	private Control SteamInfoContainer;
 	private ulong lobby_id = 0;
 
 	public override void _Ready()
@@ -19,9 +20,11 @@ public partial class Menu : Node
 		SetMultiplayerAuthority(1);
 		
 		IPField = GetNode<LineEdit>("CenterContainer/VBoxContainer/HBoxContainer/LineEdit");
-		Hud = GetNode<CenterContainer>("CenterContainer");
-		SteamInfoContainer = GetNode<Control>("SteamInfoContainer");
+		Hud = GetNode<Control>("CenterContainer");
+		SteamInfoContainer = GetNode<SteamInfoContainer>("SteamInfoContainer");
 		SteamInfoContainer.Hide();
+		LobbyContainer = GetNode<Control>("LobbyContainer");
+		LobbyContainer.Hide();
 
 		SteamStatic.InitRelayNetworkAccess();
     	SteamStatic.LobbyCreated += _on_lobby_created;
@@ -114,7 +117,15 @@ public partial class Menu : Node
 			SteamStatic.SetLobbyData(lobby_id, "mode", "Godot steam test");
 
 			SteamStatic.CreateListenSocketP2P(0, new Godot.Collections.Array());
+
+			SteamInfoContainer.LobbyId = lobby_id;
 		}
+	}
+
+	private void _on_search_pressed()
+	{
+		Hud.Hide();
+		LobbyContainer.Show();
 	}
 
 	private void _on_join_pressed()

@@ -10,9 +10,7 @@ public partial class SteamInfoContainer : VBoxContainer
 
 	public PlayerInfo PlayerInfo = new PlayerInfo();
 	public FriendList FriendList = new FriendList();
-
-	[Export] public float FriendItemHeight = 50.0f;
-	[Export] public float PlayerInfoHeight = 150.0f;
+	public ulong LobbyId;
 
 	public override void _EnterTree()
 	{

@@ -46,6 +46,7 @@ public partial class FriendItem : HBoxContainer
 
 	private void FriendButtonPressed()
 	{
-		SteamStatic.InviteUserToGame(FriendInfo.Id, "");
+		ulong LobbyId = GetTree().Root.GetNode<SteamInfoContainer>("SteamInfoContainer").LobbyId;
+		SteamStatic.InviteUserToLobby(LobbyId, FriendInfo.Id);
 	}
 }

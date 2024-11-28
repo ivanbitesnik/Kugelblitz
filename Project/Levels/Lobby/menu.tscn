@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://dlqoa5y6jtlre"]
+[gd_scene load_steps=5 format=3 uid="uid://dlqoa5y6jtlre"]
 
 [ext_resource type="Script" path="res://Levels/Lobby/Menu.cs" id="1_wunnt"]
 [ext_resource type="PackedScene" uid="uid://x0m4xoliogv0" path="res://Levels/Lobby/SteamInfoContainer.tscn" id="2_5q3ry"]
 [ext_resource type="PackedScene" uid="uid://b5d5ci2xama1h" path="res://Debug/printdebug.tscn" id="3_v6rxo"]
+[ext_resource type="PackedScene" uid="uid://c46a8dfl8md7x" path="res://Levels/Lobby/LobbyContainer.tscn" id="4_i1con"]
 
 [node name="Menu" type="Node"]
 script = ExtResource("1_wunnt")
@@ -26,6 +27,10 @@ layout_mode = 2
 [node name="Host" type="Button" parent="CenterContainer/VBoxContainer"]
 layout_mode = 2
 text = "Host Game"
+
+[node name="Search" type="Button" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "Find Game"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
 layout_mode = 2
@@ -55,7 +60,15 @@ anchor_bottom = 0.9
 
 [node name="Printdebug" parent="." instance=ExtResource("3_v6rxo")]
 
+[node name="LobbyContainer" parent="." instance=ExtResource("4_i1con")]
+anchors_preset = -1
+anchor_left = 0.3
+anchor_top = 0.1
+anchor_right = 0.7
+anchor_bottom = 0.9
+
 [connection signal="pressed" from="CenterContainer/VBoxContainer/Host" to="." method="_on_host_pressed"]
+[connection signal="pressed" from="CenterContainer/VBoxContainer/Search" to="." method="_on_search_pressed"]
 [connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/Join" to="." method="_on_join_pressed"]
 [connection signal="text_changed" from="CenterContainer/VBoxContainer/HBoxContainer/LineEdit" to="." method="_on_line_edit_text_changed"]
 [connection signal="text_submitted" from="CenterContainer/VBoxContainer/HBoxContainer/LineEdit" to="." method="_on_line_edit_text_submitted"]
