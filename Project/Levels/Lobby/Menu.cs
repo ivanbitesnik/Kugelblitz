@@ -26,7 +26,6 @@ public partial class Menu : Node
 		LobbyContainer = GetNode<LobbyContainer>("LobbyContainer");
 		LobbyContainer.Hide();
 
-		SteamStatic.InitRelayNetworkAccess();
     	SteamStatic.LobbyCreated += _on_lobby_created;
     	SteamStatic.LobbyJoined += _on_lobby_joined;
 		SteamStatic.LobbyMatchList += _on_lobby_search_finished;
@@ -45,7 +44,7 @@ public partial class Menu : Node
 			{
 				if (args[1].ToInt() > 0)
 				{
-					JoinLobby((ulong)args[1].ToInt());
+					SteamStatic.JoinLobby((ulong)args[1].ToInt());
 				}
 			}
 		}
@@ -115,16 +114,15 @@ public partial class Menu : Node
 		if (connect == 1)
 		{
 			lobby_id = lobbyId;
-			string debugString = "Created lobby id:" + lobbyId.ToString();
-			DebugManager.PrintString(this,  debugString, 10.0f);
 
+			SteamStatic.SetLobbyType(lobbyId, SteamStatic.LobbyType.Public);
 			SteamStatic.SetLobbyJoinable(lobby_id, true);
 
 			string steamName = SteamStatic.GetFriendPersonaName(SteamStatic.GetSteamID());
 			SteamStatic.SetLobbyData(lobby_id, "name", steamName + "'s Lobby");
-			SteamStatic.SetLobbyData(lobby_id, "mode", "Godot steam test");
 
 			SteamStatic.CreateListenSocketP2P(0, new Godot.Collections.Array());
+			SteamStatic.InitRelayNetworkAccess();
 
 			SteamInfoContainer.LobbyId = lobby_id;
 		}
@@ -157,17 +155,12 @@ public partial class Menu : Node
 
 	private void _on_join_requested(ulong lobbyId, ulong steamId)
 	{
-		SteamStatic.AcceptConnection((uint)steamId);
-	}
-
-	private void JoinLobby(ulong lobbyId)
-	{
 		SteamStatic.JoinLobby(lobbyId);
 	}
 
 	private void _on_lobby_joined(ulong lobbyId, long permissions, bool locked, long response)
 	{
-		if (response == 1)
+		if (response == 1 && lobbyId != lobby_id)
 		{
 			lobby_id = lobbyId;
 			string debugString = "Joined lobby id: " + lobbyId.ToString();
