@@ -15,6 +15,8 @@ public partial class LobbyContainer : VBoxContainer
 	{
 		ListHeader.SizeFlagsVertical = SizeFlags.ExpandFill;
 		ListHeader.Text = HeaderText;
+		ListHeader.HorizontalAlignment = HorizontalAlignment.Center;
+		ListHeader.Modulate = Colors.Green;
 		AddChild(ListHeader);
 
 		ScrollBox.VerticalScrollMode = ScrollContainer.ScrollMode.ShowAlways;
@@ -27,5 +29,36 @@ public partial class LobbyContainer : VBoxContainer
 		LobbyList.SizeFlagsVertical = SizeFlags.ExpandFill;
 		LobbyList.SizeFlagsHorizontal = SizeFlags.ExpandFill;
 		ScrollBox.AddChild(LobbyList);
+	}
+
+	public void SetLobbies(Godot.Collections.Array lobbies)
+	{
+		for (int i = 0; i < lobbies.Count; i++)
+		{
+			LobbyButton Button = new LobbyButton();
+			string lobbyName = SteamStatic.GetLobbyData((ulong)lobbies[i], "name");
+			lobbyName = lobbyName.Length == 0 ? SteamStatic.GetLobbyData((ulong)lobbies[i], "Name") : lobbyName;
+			if (lobbyName.Length == 0) continue;
+			Button.Text = lobbyName;
+			Button.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+			Button.Lobby = lobbies[i];
+
+			LobbyList.AddChild(Button);
+		}
+	}
+}
+
+public partial class LobbyButton : Button
+{
+	public Godot.Variant Lobby;
+
+    public override void _Ready()
+    {
+        ButtonUp += OnLobbyButtonPressed;
+    }
+
+    public void OnLobbyButtonPressed()
+	{
+		SteamStatic.JoinLobby(Lobby.AsUInt32());
 	}
 }
