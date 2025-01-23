@@ -41,7 +41,7 @@ public partial class LobbyContainer : VBoxContainer
 			if (lobbyName.Length == 0) continue;
 			Button.Text = lobbyName;
 			Button.SizeFlagsHorizontal = SizeFlags.ExpandFill;
-			Button.LobbyId = lobbies[i];
+			Button.LobbyId = (ulong)lobbies[i];
 
 			LobbyList.AddChild(Button);
 		}
@@ -50,7 +50,7 @@ public partial class LobbyContainer : VBoxContainer
 
 public partial class LobbyButton : Button
 {
-	public Godot.Variant LobbyId;
+	public ulong LobbyId;
 
     public override void _Ready()
     {
@@ -59,6 +59,6 @@ public partial class LobbyButton : Button
 
     public void OnLobbyButtonPressed()
 	{
-		SteamStatic.JoinLobby(LobbyId.AsUInt32());
+		SteamStatic.JoinLobby(LobbyId);
 	}
 }

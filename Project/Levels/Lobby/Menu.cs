@@ -1,6 +1,8 @@
 using Godot;
 using GodotSteam;
 using System;
+using System.Diagnostics;
+using System.Net.Sockets;
 
 public partial class Menu : Node
 {
@@ -26,10 +28,13 @@ public partial class Menu : Node
 		LobbyContainer = GetNode<LobbyContainer>("LobbyContainer");
 		LobbyContainer.Hide();
 
+		SteamStatic.InitRelayNetworkAccess();
+
     	SteamStatic.LobbyCreated += _on_lobby_created;
     	SteamStatic.LobbyJoined += _on_lobby_joined;
 		SteamStatic.LobbyMatchList += _on_lobby_search_finished;
 		SteamStatic.JoinRequested += _on_join_requested;
+		SteamStatic.LobbyDataUpdate += _on_lobby_data_update;
 		SteamStatic.NetworkConnectionStatusChanged += _on_network_connection_status_changed;
 
     	CheckCommandLine();
@@ -52,13 +57,11 @@ public partial class Menu : Node
 
 	private void _on_network_connection_status_changed(long connectHandle, Godot.Collections.Dictionary connection, long oldState)
 	{
-		string debugString = "";
-		for (int i = 0; i < connection.Count; i++)
-		{
-			debugString += "Value: " + connection[i].ToString();
-		}
+		SteamStatic.NetworkingConnectionState ConnectionState = (SteamStatic.NetworkingConnectionState)connection["connection_state"].AsInt64();
+		string debugString = "Connection state: " + ConnectionState.ToString();
+		DebugManager.PrintString(this, debugString, 10.0f);
 
-		DebugManager.PrintString(this, debugString, 30.0f);
+		SteamStatic.AcceptConnection((uint)connectHandle);
 	}
 
 	// Called by client for the present server and called by server for connected client
@@ -115,16 +118,28 @@ public partial class Menu : Node
 		{
 			lobby_id = lobbyId;
 
-			SteamStatic.SetLobbyType(lobbyId, SteamStatic.LobbyType.Public);
+			SteamStatic.SetLobbyOwner(lobby_id, SteamStatic.GetSteamID());
 			SteamStatic.SetLobbyJoinable(lobby_id, true);
 
 			string steamName = SteamStatic.GetFriendPersonaName(SteamStatic.GetSteamID());
 			SteamStatic.SetLobbyData(lobby_id, "name", steamName + "'s Lobby");
 
 			SteamStatic.CreateListenSocketP2P(0, new Godot.Collections.Array());
-			SteamStatic.InitRelayNetworkAccess();
 
 			SteamInfoContainer.LobbyId = lobby_id;
+		}
+		else
+		{
+			DebugManager.PrintString(this, "Lobby creation failed", 10.0f);
+		}
+	}
+
+	public override void _Process(double delta)
+    {
+		for (int i = 0; i < SteamStatic.GetNumLobbyMembers(lobby_id); i++)
+		{
+			ulong user = SteamStatic.GetLobbyMemberByIndex(lobby_id, i);
+			DebugManager.PrintString(this, SteamStatic.GetPlayerNickname(user), delta);
 		}
 	}
 
@@ -153,6 +168,7 @@ public partial class Menu : Node
 		Hud.Hide();
 	}
 
+	// Steam invites trigger this callback on the invitee
 	private void _on_join_requested(ulong lobbyId, ulong steamId)
 	{
 		SteamStatic.JoinLobby(lobbyId);
@@ -160,14 +176,19 @@ public partial class Menu : Node
 
 	private void _on_lobby_joined(ulong lobbyId, long permissions, bool locked, long response)
 	{
-		if (response == 1 && lobbyId != lobby_id)
+		ChatRoomEnterResponse Response = (ChatRoomEnterResponse)response;
+		DebugManager.PrintString(this, "Attempting to join lobby: " + lobbyId.ToString() + ", response: " + Response.ToString(), 10.0f);
+		if (Response == ChatRoomEnterResponse.Success && lobbyId != lobby_id)
 		{
 			lobby_id = lobbyId;
-			string debugString = "Joined lobby id: " + lobbyId.ToString();
-			DebugManager.PrintString(this, debugString, 10.0f);
-
-			SteamStatic.ConnectP2P(lobbyId, 0, new Godot.Collections.Array());
+			// wtf is identity?
+			SteamStatic.ConnectP2P(SteamStatic.GetLobbyOwner(lobby_id), 0, new Godot.Collections.Array());
 		}
+	}
+
+	private void _on_lobby_data_update(uint success, ulong lobbyID, ulong memberID)
+	{
+		DebugManager.PrintString(this, "Lobby data updated, lobby id: " + lobbyID.ToString() + ", member id: " + memberID.ToString(), 10.0f);
 	}
 
 	private void _on_line_edit_changed(string newText)
@@ -192,6 +213,13 @@ public partial class Menu : Node
     	if (what == NotificationWMCloseRequest)
 		{
 			Multiplayer.MultiplayerPeer = null;
+			if (lobby_id != 0)
+			{
+				SteamStatic.CloseListenSocket(0);
+				SteamStatic.LeaveLobby(lobby_id);
+				lobby_id = 0;
+			}
+
         	GetTree().Quit(); // default behavior
 		}
 	}
