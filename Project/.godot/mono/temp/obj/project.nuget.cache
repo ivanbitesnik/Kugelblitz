@@ -1,14 +1,15 @@
 {
   "version": 2,
-  "dgSpecHash": "92JGJdBVgHbG52xZ3xwn/5Sk6Rw3ZXFINaOYTI3qabGZNhyYN/iRuwiX1INbiDApxxUCQnFx9Ojl18tEkv652A==",
+  "dgSpecHash": "2qwdOGBu1Ilc4VOk/qwDihu4wuUpM/xGcHCOYBYX9k6DXDBknBIwGKTcNTH8yT7UcKeUj9+m5upbn8LlvGNfuQ==",
   "success": true,
   "projectFilePath": "/home/acheto/Desktop/engine/kugelblitz/Project/Kugelblitz.csproj",
   "expectedPackageFiles": [
     "/home/acheto/.nuget/packages/godot.sourcegenerators/4.3.0/godot.sourcegenerators.4.3.0.nupkg.sha512",
     "/home/acheto/.nuget/packages/godotsharp/4.3.0/godotsharp.4.3.0.nupkg.sha512",
-    "/home/acheto/.nuget/packages/godotsharpeditor/4.3.0/godotsharpeditor.4.3.0.nupkg.sha512",
     "/home/acheto/.nuget/packages/microsoft.netcore.app.ref/6.0.36/microsoft.netcore.app.ref.6.0.36.nupkg.sha512",
-    "/home/acheto/.nuget/packages/microsoft.aspnetcore.app.ref/6.0.36/microsoft.aspnetcore.app.ref.6.0.36.nupkg.sha512"
+    "/home/acheto/.nuget/packages/microsoft.netcore.app.runtime.linux-x64/6.0.36/microsoft.netcore.app.runtime.linux-x64.6.0.36.nupkg.sha512",
+    "/home/acheto/.nuget/packages/microsoft.aspnetcore.app.ref/6.0.36/microsoft.aspnetcore.app.ref.6.0.36.nupkg.sha512",
+    "/home/acheto/.nuget/packages/microsoft.aspnetcore.app.runtime.linux-x64/6.0.36/microsoft.aspnetcore.app.runtime.linux-x64.6.0.36.nupkg.sha512"
   ],
   "logs": []
 }

@@ -7,6 +7,8 @@ using System.Net.Sockets;
 public partial class Menu : Node
 {
 	private PackedScene WorldScene = GD.Load<PackedScene>("res://Levels/world.tscn");
+	private GDScript P2PFunctionLibrary = GD.Load<GDScript>("res://Levels/Lobby/P2PFunctionLibrary.gd");
+	private GodotObject P2PFunctionLibraryNode;
 
 	[Export] private int PORT = 8080;
 	[Export] private string ADDRESS = "127.0.0.1";
@@ -20,6 +22,8 @@ public partial class Menu : Node
 	public override void _Ready()
 	{
 		SetMultiplayerAuthority(1);
+
+		P2PFunctionLibraryNode = (GodotObject)P2PFunctionLibrary.New();
 		
 		IPField = GetNode<LineEdit>("CenterContainer/VBoxContainer/HBoxContainer/LineEdit");
 		Hud = GetNode<Control>("CenterContainer");
@@ -34,8 +38,6 @@ public partial class Menu : Node
     	SteamStatic.LobbyJoined += _on_lobby_joined;
 		SteamStatic.LobbyMatchList += _on_lobby_search_finished;
 		SteamStatic.JoinRequested += _on_join_requested;
-		SteamStatic.LobbyDataUpdate += _on_lobby_data_update;
-		SteamStatic.NetworkConnectionStatusChanged += _on_network_connection_status_changed;
 
     	CheckCommandLine();
 	}
@@ -53,17 +55,6 @@ public partial class Menu : Node
 				}
 			}
 		}
-	}
-
-	private void _on_network_connection_status_changed(long connectHandle, Godot.Collections.Dictionary connection, long oldState)
-	{
-		SteamStatic.NetworkingConnectionState ConnectionState = (SteamStatic.NetworkingConnectionState)connection["connection_state"].AsInt64();
-		string debugString = "Connection state: " + ConnectionState.ToString();
-		DebugManager.PrintString(this, debugString, 10.0f);
-
-		SteamStatic.AcceptConnection((uint)connectHandle);
-
-		Rpc(nameof(TravelToWorld));
 	}
 
 	// Called by client for the present server and called by server for connected client
@@ -129,6 +120,8 @@ public partial class Menu : Node
 			SteamStatic.CreateListenSocketP2P(0, new Godot.Collections.Array());
 
 			SteamInfoContainer.LobbyId = lobby_id;
+
+			P2PFunctionLibraryNode.Call("CreateServerPeer");
 		}
 		else
 		{
@@ -174,14 +167,10 @@ public partial class Menu : Node
 		if (Response == ChatRoomEnterResponse.Success && lobbyId != lobby_id)
 		{
 			lobby_id = lobbyId;
-			// wtf is identity?
-			SteamStatic.ConnectP2P(SteamStatic.GetLobbyOwner(lobby_id), 0, new Godot.Collections.Array());
-		}
-	}
+			P2PFunctionLibraryNode.Call("CreateClientPeer", SteamStatic.GetLobbyOwner(lobby_id));
 
-	private void _on_lobby_data_update(uint success, ulong lobbyID, ulong memberID)
-	{
-		DebugManager.PrintString(this, "Lobby data updated, lobby id: " + lobbyID.ToString() + ", member id: " + memberID.ToString(), 10.0f);
+			Rpc(nameof(TravelToWorld));
+		}
 	}
 
 	private void _on_line_edit_changed(string newText)
