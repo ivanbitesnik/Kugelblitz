@@ -68,19 +68,22 @@ public partial class Menu : Node
 
 	private void ConnectedToServer()
 	{
-		GD.Print("Connected to server, ID: ", Multiplayer.GetUniqueId().ToString());
+		DebugManager.PrintString(this, "Connected to server, ID: " + Multiplayer.GetUniqueId().ToString(), 10.0f);
 
 		Rpc(nameof(TravelToWorld));
-
-		GD.Print("Joining match...");
 	}
 
 	private void ConnectionFailed()
 	{
+		if (SteamStatic.IsSteamRunning())
+		{
+			DebugManager.PrintString(this, "Failed to connect to server", 10.0f);
+			return;
+		}
+
 		IPField.Text = "";
 		IPField.PlaceholderText = "Invalid IP!";
 		Hud.Show();
-		SteamInfoContainer.Hide();
 	}
 
 	private void _on_host_pressed()
@@ -116,8 +119,6 @@ public partial class Menu : Node
 
 			string steamName = SteamStatic.GetFriendPersonaName(SteamStatic.GetSteamID());
 			SteamStatic.SetLobbyData(lobby_id, "name", steamName + "'s Lobby");
-
-			SteamStatic.CreateListenSocketP2P(0, new Godot.Collections.Array());
 
 			SteamInfoContainer.LobbyId = lobby_id;
 
@@ -162,14 +163,17 @@ public partial class Menu : Node
 
 	private void _on_lobby_joined(ulong lobbyId, long permissions, bool locked, long response)
 	{
+		if (lobby_id == lobbyId) return;
+
 		ChatRoomEnterResponse Response = (ChatRoomEnterResponse)response;
 		DebugManager.PrintString(this, "Attempting to join lobby: " + lobbyId.ToString() + ", response: " + Response.ToString(), 10.0f);
-		if (Response == ChatRoomEnterResponse.Success && lobbyId != lobby_id)
+		if (Response == ChatRoomEnterResponse.Success)
 		{
 			lobby_id = lobbyId;
 			P2PFunctionLibraryNode.Call("CreateClientPeer", SteamStatic.GetLobbyOwner(lobby_id));
 
-			Rpc(nameof(TravelToWorld));
+			Multiplayer.ConnectionFailed += ConnectionFailed;
+			Multiplayer.ConnectedToServer += ConnectedToServer;
 		}
 	}
 
