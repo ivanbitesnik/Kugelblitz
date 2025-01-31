@@ -8,7 +8,7 @@ public partial class Menu : Node
 {
 	private PackedScene WorldScene = GD.Load<PackedScene>("res://Levels/world.tscn");
 	private GDScript P2PFunctionLibrary = GD.Load<GDScript>("res://Levels/Lobby/P2PFunctionLibrary.gd");
-	private GodotObject P2PFunctionLibraryNode;
+	private Node P2PFunctionLibraryNode;
 
 	[Export] private int PORT = 8080;
 	[Export] private string ADDRESS = "127.0.0.1";
@@ -23,7 +23,8 @@ public partial class Menu : Node
 	{
 		SetMultiplayerAuthority(1);
 
-		P2PFunctionLibraryNode = (GodotObject)P2PFunctionLibrary.New();
+		P2PFunctionLibraryNode = (Node)P2PFunctionLibrary.New();
+		AddChild(P2PFunctionLibraryNode);
 		
 		IPField = GetNode<LineEdit>("CenterContainer/VBoxContainer/HBoxContainer/LineEdit");
 		Hud = GetNode<Control>("CenterContainer");
@@ -55,15 +56,6 @@ public partial class Menu : Node
 				}
 			}
 		}
-	}
-
-	// Called by client for the present server and called by server for connected client
-	private void PeerConnected(long id)
-	{
-		string contextString = Multiplayer.IsServer() ? "Server" : "Client";
-		GD.Print("Peer connected, ID: ", id.ToString(), ", Context: ", contextString);
-		
-		TravelToWorld();
 	}
 
 	private void ConnectedToServer()
