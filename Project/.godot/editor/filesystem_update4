@@ -1,2 +1,13 @@
-res://Levels/Lobby/menu.tscn
-res://Levels/Lobby/P2PScript.gd
+res://Character/Player.cs
+res://Levels/Lobby/LobbyContainer.cs
+res://Levels/Lobby/PlayerInfo.cs
+res://Character/Weapon.cs
+res://Levels/World.cs
+res://Arena/Skybox.cs
+res://Graviton.cs
+res://Debug/Printdebug.cs
+res://Levels/Lobby/Menu.cs
+res://Levels/Lobby/SteamInfoContainer.cs
+res://Levels/Lobby/FriendItem.cs
+res://Levels/Lobby/FriendList.cs
+res://Projectile/Projectile.cs

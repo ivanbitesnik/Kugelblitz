@@ -62,6 +62,8 @@ public partial class Menu : Node
 		DebugManager.PrintString(this, debugString, 10.0f);
 
 		SteamStatic.AcceptConnection((uint)connectHandle);
+
+		Rpc(nameof(TravelToWorld));
 	}
 
 	// Called by client for the present server and called by server for connected client
@@ -131,15 +133,6 @@ public partial class Menu : Node
 		else
 		{
 			DebugManager.PrintString(this, "Lobby creation failed", 10.0f);
-		}
-	}
-
-	public override void _Process(double delta)
-    {
-		for (int i = 0; i < SteamStatic.GetNumLobbyMembers(lobby_id); i++)
-		{
-			ulong user = SteamStatic.GetLobbyMemberByIndex(lobby_id, i);
-			DebugManager.PrintString(this, SteamStatic.GetPlayerNickname(user), delta);
 		}
 	}
 

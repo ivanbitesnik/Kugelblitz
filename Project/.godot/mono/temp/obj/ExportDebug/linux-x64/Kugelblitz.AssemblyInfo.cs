@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Kugelblitz")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("ExportDebug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+217c14e9a06ae3a272ee810e540c4d8e41ecf861")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+80c23a19338c5e69ee53e92e6eb6d339d0a7b8da")]
 [assembly: System.Reflection.AssemblyProductAttribute("Kugelblitz")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Kugelblitz")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
