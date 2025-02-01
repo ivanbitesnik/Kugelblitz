@@ -1,13 +1,13 @@
 linux:
 	echo "Starting build for Linux"
-	mkdir builds/linux
-	godot --headless --path "Project" --export-release "Linux desktop" "../builds/linux/kugel.x86_64"
+	mkdir -p builds/linux
+	godot --headless --path "Project" --export-release "Linux" "../builds/linux/kugel.x86_64"
 	echo "All Done!"
 
 win: 
 	echo "Starting build for Windows"
-	mkdir builds/windows
-	godot --headless --path "Project" --export-release "Windows desktop" "../builds/windows/kugel.exe"
+	mkdir -p builds/windows
+	godot --headless --path "Project" --export-release "Windows" "../builds/windows/kugel.exe"
 	echo "All Done!"
 
 all: linux win
