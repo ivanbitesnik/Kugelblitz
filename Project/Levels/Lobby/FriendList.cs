@@ -19,10 +19,11 @@ public partial class FriendList : ScrollContainer
 		VerticalContainer.SizeFlagsVertical = SizeFlags.ExpandFill;
 		VerticalContainer.SizeFlagsHorizontal = SizeFlags.ExpandFill;
 		AddChild(VerticalContainer);
-		
-		var friendsList = SteamStatic.GetUserSteamFriends();
+	}
 
-		ClearList();
+	public void Initialize()
+	{
+		var friendsList = SteamStatic.GetUserSteamFriends();
 		
 		friendsList = SortFriendList(friendsList);
 		foreach (var friend in friendsList)
@@ -61,7 +62,7 @@ public partial class FriendList : ScrollContainer
 		return FriendList;
 	}
 
-	private void ClearList()
+	public void ClearList()
 	{
 		foreach (var child in VerticalContainer.GetChildren())
 		{

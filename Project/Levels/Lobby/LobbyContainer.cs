@@ -7,17 +7,26 @@ public partial class LobbyContainer : VBoxContainer
 {
 	[Export] public string HeaderText = "Lobby List";
 
-	public Label ListHeader = new Label();
+	public HBoxContainer HeaderContainer = new HBoxContainer();
+	public Button BackToMenuButton = new Button();
+	public Button RefreshButton = new Button();
 	public ScrollContainer ScrollBox = new ScrollContainer();
 	public VBoxContainer LobbyList = new VBoxContainer();
 
 	public override void _Ready()
 	{
-		ListHeader.SizeFlagsVertical = SizeFlags.ExpandFill;
-		ListHeader.Text = HeaderText;
-		ListHeader.HorizontalAlignment = HorizontalAlignment.Center;
-		ListHeader.Modulate = Colors.Green;
-		AddChild(ListHeader);
+		AddChild(HeaderContainer);
+
+		BackToMenuButton.SizeFlagsVertical  = SizeFlags.ExpandFill;
+		BackToMenuButton.Text = "Back to menu";
+		BackToMenuButton.Modulate = Colors.IndianRed;
+		HeaderContainer.AddChild(BackToMenuButton);
+
+		RefreshButton.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+		RefreshButton.Text = "Refresh";
+		RefreshButton.ButtonUp += OnRefreshPressed;
+		RefreshButton.Modulate = Colors.SkyBlue;
+		HeaderContainer.AddChild(RefreshButton);
 
 		ScrollBox.VerticalScrollMode = ScrollContainer.ScrollMode.ShowAlways;
 		ScrollBox.HorizontalScrollMode = ScrollContainer.ScrollMode.Disabled;
@@ -29,6 +38,21 @@ public partial class LobbyContainer : VBoxContainer
 		LobbyList.SizeFlagsVertical = SizeFlags.ExpandFill;
 		LobbyList.SizeFlagsHorizontal = SizeFlags.ExpandFill;
 		ScrollBox.AddChild(LobbyList);
+	}
+
+	private void OnRefreshPressed()
+	{
+		ClearLobbies();
+
+		SteamStatic.RequestLobbyList();
+	}
+
+	public void ClearLobbies()
+	{
+		foreach (Node node in LobbyList.GetChildren())
+		{
+			LobbyList.RemoveChild(node);
+		}
 	}
 
 	public void SetLobbies(Godot.Collections.Array lobbies)

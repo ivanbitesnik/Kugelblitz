@@ -13,7 +13,7 @@ public partial class Menu : Node
 	[Export] private int PORT = 8080;
 	[Export] private string ADDRESS = "127.0.0.1";
 
-	private Control Hud;
+	private Control MenuContainer;
 	private SteamInfoContainer SteamInfoContainer;
 	private LobbyContainer LobbyContainer;
 	private LineEdit IPField;
@@ -27,11 +27,17 @@ public partial class Menu : Node
 		AddChild(P2PFunctionLibraryNode);
 		
 		IPField = GetNode<LineEdit>("CenterContainer/VBoxContainer/HBoxContainer/LineEdit");
-		Hud = GetNode<Control>("CenterContainer");
+		MenuContainer = GetNode<Control>("CenterContainer");
+
 		SteamInfoContainer = GetNode<SteamInfoContainer>("SteamInfoContainer");
 		SteamInfoContainer.Hide();
+		SteamInfoContainer.CloseLobbyButton.ButtonUp += OnBackToMenuPressed;
+		AddChild(SteamInfoContainer);
+
 		LobbyContainer = GetNode<LobbyContainer>("LobbyContainer");
 		LobbyContainer.Hide();
+		LobbyContainer.BackToMenuButton.ButtonUp += OnBackToMenuPressed;
+		AddChild(LobbyContainer);
 
 		SteamStatic.InitRelayNetworkAccess();
 
@@ -75,7 +81,7 @@ public partial class Menu : Node
 
 		IPField.Text = "";
 		IPField.PlaceholderText = "Invalid IP!";
-		Hud.Show();
+		MenuContainer.Show();
 	}
 
 	private void _on_host_pressed()
@@ -87,7 +93,7 @@ public partial class Menu : Node
 			Multiplayer.MultiplayerPeer = peer;
 
 			GD.Print("Waiting for players...");
-			Hud.Hide();
+			MenuContainer.Hide();
 			SteamInfoContainer.Show();
 			return;
 		}
@@ -96,7 +102,7 @@ public partial class Menu : Node
 
 		SteamStatic.CreateLobby(SteamStatic.LobbyType.Public, 2);
 
-		Hud.Hide();
+		MenuContainer.Hide();
 		SteamInfoContainer.Show();
 	}
 
@@ -112,7 +118,7 @@ public partial class Menu : Node
 			string steamName = SteamStatic.GetFriendPersonaName(SteamStatic.GetSteamID());
 			SteamStatic.SetLobbyData(lobby_id, "name", steamName + "'s Lobby");
 
-			SteamInfoContainer.LobbyId = lobby_id;
+			SteamInfoContainer.Initialize();
 
 			P2PFunctionLibraryNode.Call("CreateServerPeer");
 		}
@@ -124,7 +130,7 @@ public partial class Menu : Node
 
 	private void _on_search_pressed()
 	{
-		Hud.Hide();
+		MenuContainer.Hide();
 		SteamStatic.AddRequestLobbyListDistanceFilter(SteamStatic.LobbyDistanceFilter.Close);
 		SteamStatic.RequestLobbyList();
 	}
@@ -133,6 +139,24 @@ public partial class Menu : Node
 	{
 		LobbyContainer.SetLobbies(lobbies);
 		LobbyContainer.Show();
+	}
+
+	private void OnBackToMenuPressed()
+	{
+		if (lobby_id != 0)
+		{
+			SteamStatic.LeaveLobby(lobby_id);
+			SteamInfoContainer.Hide();
+			SteamInfoContainer.OnLobbyClosed();
+			lobby_id = 0;
+		}
+		else
+		{
+			LobbyContainer.Hide();
+			LobbyContainer.ClearLobbies();
+		}
+
+		MenuContainer.Show();
 	}
 
 	private void _on_join_pressed()
@@ -144,7 +168,7 @@ public partial class Menu : Node
 		Multiplayer.ConnectionFailed += ConnectionFailed;
 		
 		Multiplayer.ConnectedToServer += ConnectedToServer;
-		Hud.Hide();
+		MenuContainer.Hide();
 	}
 
 	// Steam invites trigger this callback on the invitee
@@ -180,6 +204,11 @@ public partial class Menu : Node
 		_on_join_pressed();
 	}
 
+	public ulong GetLobbyId()
+	{
+		return lobby_id;
+	}
+
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
 	private void TravelToWorld()
 	{
@@ -193,7 +222,6 @@ public partial class Menu : Node
 			Multiplayer.MultiplayerPeer = null;
 			if (lobby_id != 0)
 			{
-				SteamStatic.CloseListenSocket(0);
 				SteamStatic.LeaveLobby(lobby_id);
 				lobby_id = 0;
 			}

@@ -8,9 +8,9 @@ public partial class SteamInfoContainer : VBoxContainer
 {
 	private const uint AppId = 480;
 
+	public Button CloseLobbyButton = new Button();
 	public PlayerInfo PlayerInfo = new PlayerInfo();
 	public FriendList FriendList = new FriendList();
-	public ulong LobbyId;
 
 	public override void _EnterTree()
 	{
@@ -25,12 +25,27 @@ public partial class SteamInfoContainer : VBoxContainer
 		GD.Print(steamInitResult);
 		DebugManager.PrintString(this, steamInitResult, 10.0f);
 
+		CloseLobbyButton.SizeFlagsHorizontal = SizeFlags.ExpandFill;
+		CloseLobbyButton.Text = "Close lobby";
+		CloseLobbyButton.Modulate = Colors.IndianRed;
+		AddChild(CloseLobbyButton);
+
 		PlayerInfo.SizeFlagsVertical = SizeFlags.ExpandFill;
 		AddChild(PlayerInfo);
 
 		FriendList.SizeFlagsVertical = SizeFlags.ExpandFill;
 		FriendList.SizeFlagsStretchRatio = 3.0f;
 		AddChild(FriendList);
+	}
+
+	public void Initialize()
+	{
+		FriendList.Initialize();
+	}
+
+	public void OnLobbyClosed()
+	{
+		FriendList.ClearList();
 	}
 
     public override void _Process(double delta)
