@@ -30,14 +30,15 @@ public partial class Projectile : RigidBody3D
 		Graviton = GetTree().Root.GetNode<Graviton>("World/Arena/Graviton");
 	}
 
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
 	public override void _Process(double delta)
 	{
 		float distanceToGraviton = Position.DistanceTo(Graviton.Position);
 		if (distanceToGraviton <= Graviton.GetInfluenceRange())
 		{
+			float deltaFloat = (float)delta;
 			Vector3 pullForce = Position.DirectionTo(Graviton.Position) * Graviton.GetIntensity() * (1.0f / distanceToGraviton);
-			ApplyForce(pullForce);
+			Vector3 deltaForce = pullForce * new Vector3(deltaFloat, deltaFloat, deltaFloat);
+			ApplyForce(deltaForce);
 		}
 	}
 
