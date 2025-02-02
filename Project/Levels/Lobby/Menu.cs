@@ -143,10 +143,9 @@ public partial class Menu : Node
 	{
 		if (lobby_id != 0)
 		{
-			SteamStatic.LeaveLobby(lobby_id);
+			LeaveLobby();
 			SteamInfoContainer.Hide();
 			SteamInfoContainer.OnLobbyClosed();
-			lobby_id = 0;
 		}
 		else
 		{
@@ -210,6 +209,7 @@ public partial class Menu : Node
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
 	private void TravelToWorld()
 	{
+		LeaveLobby(false);
 		GetTree().ChangeSceneToPacked(WorldScene);
 	}
 
@@ -217,14 +217,29 @@ public partial class Menu : Node
 	{
     	if (what == NotificationWMCloseRequest)
 		{
-			Multiplayer.MultiplayerPeer = null;
-			if (lobby_id != 0)
-			{
-				SteamStatic.LeaveLobby(lobby_id);
-				lobby_id = 0;
-			}
+			LeaveLobby();
 
         	GetTree().Quit(); // default behavior
 		}
+	}
+
+	public void LeaveLobby(bool bClosePeerConnection = true)
+	{
+		if (bClosePeerConnection)
+		{
+			if (Multiplayer.MultiplayerPeer is not null) Multiplayer.MultiplayerPeer.Close();
+			Multiplayer.MultiplayerPeer = null;
+		}
+
+		if (lobby_id != 0)
+		{
+			SteamStatic.LeaveLobby(lobby_id);
+			lobby_id = 0;
+		}
+	}
+
+	public void _on_exit_game_button_up()
+	{
+		GetTree().Root.PropagateNotification((int)NotificationWMCloseRequest);
 	}
 }

@@ -52,6 +52,15 @@ custom_minimum_size = Vector2(150, 0)
 layout_mode = 2
 placeholder_text = "255.255.255.255"
 
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+
+[node name="ExitGame" type="Button" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+text = "ExitGame
+"
+
 [node name="SteamInfoContainer" parent="." instance=ExtResource("2_5q3ry")]
 anchor_left = 0.3
 anchor_top = 0.1
@@ -72,3 +81,4 @@ anchor_bottom = 0.9
 [connection signal="pressed" from="CenterContainer/VBoxContainer/HBoxContainer/Join" to="." method="_on_join_pressed"]
 [connection signal="text_changed" from="CenterContainer/VBoxContainer/HBoxContainer/LineEdit" to="." method="_on_line_edit_text_changed"]
 [connection signal="text_submitted" from="CenterContainer/VBoxContainer/HBoxContainer/LineEdit" to="." method="_on_line_edit_text_submitted"]
+[connection signal="button_up" from="CenterContainer/VBoxContainer/ExitGame" to="." method="_on_exit_game_button_up"]

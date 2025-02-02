@@ -5,10 +5,11 @@ using Kugelblitz.Character;
 public partial class World : Node3D
 {
 	private PackedScene MenuScene = GD.Load<PackedScene>("res://Levels/Lobby/menu.tscn");
+	private PackedScene OptionsScene = GD.Load<PackedScene>("res://Levels/OptionsMenu.tscn");
 
 	[Export] private PackedScene PlayerScene;
+	private Node OptionsMenuInstance;
 
-	// Called when the node enters the scene tree for the first time.
 	public override void _Ready()
 	{
 		//Input.SetMouseMode(Input.MouseModeEnum.Confined);
@@ -30,9 +31,21 @@ public partial class World : Node3D
 		SpawnPlayers(id);
 	}
 
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(double delta)
+	public override void _Input(InputEvent @event)
 	{
+		if (@event.IsActionPressed("OpenOptions"))
+		{
+			if (OptionsMenuInstance is null)
+			{
+				OptionsMenuInstance = OptionsScene.Instantiate();
+				AddChild(OptionsMenuInstance);
+			}
+			else
+			{
+				OptionsMenuInstance.QueueFree();
+				OptionsMenuInstance = null;
+			}
+		}
 	}
 
 	// Called on any context for disconnected peer
@@ -72,6 +85,7 @@ public partial class World : Node3D
 	{
 		Multiplayer.MultiplayerPeer.Close();
 		Multiplayer.MultiplayerPeer = null;
+		QueueFree();
 		GetTree().ChangeSceneToPacked(MenuScene);
 	}
 
