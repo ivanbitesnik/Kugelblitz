@@ -29,8 +29,6 @@ properties/4/replication_mode = 1
 
 [node name="Graviton" type="RigidBody3D"]
 script = ExtResource("1_b8me3")
-InfluenceRange = 50.0
-Intensity = 5000.0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("SphereShape3D_0p0xk")

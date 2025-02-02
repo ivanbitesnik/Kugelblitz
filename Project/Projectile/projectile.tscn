@@ -21,6 +21,7 @@ properties/1/replication_mode = 1
 collision_layer = 2
 mass = 10.0
 script = ExtResource("1_ww0lx")
+Damage = 25.0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("SphereShape3D_tmvjn")

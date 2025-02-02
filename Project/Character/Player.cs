@@ -232,7 +232,7 @@ namespace Kugelblitz.Character
 		return ParryCooldownLeft > 0.0f;
 	}
 
-	public void DealDamage(float damage)
+	public void ReceiveDamage(float damage)
 	{
 		Health -= damage;
 		if (Health <= 0)

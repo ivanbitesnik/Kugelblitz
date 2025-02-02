@@ -32,12 +32,10 @@ public partial class Menu : Node
 		SteamInfoContainer = GetNode<SteamInfoContainer>("SteamInfoContainer");
 		SteamInfoContainer.Hide();
 		SteamInfoContainer.CloseLobbyButton.ButtonUp += OnBackToMenuPressed;
-		AddChild(SteamInfoContainer);
 
 		LobbyContainer = GetNode<LobbyContainer>("LobbyContainer");
 		LobbyContainer.Hide();
 		LobbyContainer.BackToMenuButton.ButtonUp += OnBackToMenuPressed;
-		AddChild(LobbyContainer);
 
 		SteamStatic.InitRelayNetworkAccess();
 

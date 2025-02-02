@@ -4,7 +4,6 @@ using Kugelblitz.Character;
 
 public partial class Projectile : RigidBody3D
 {
-	[Export] private float Intensity;
 	private Color Color;
 	[Export] private float Damage;
 	private Graviton Graviton;
@@ -13,7 +12,6 @@ public partial class Projectile : RigidBody3D
 	{
 		Color = color;
 		Position = position;
-		Damage = 25.0f;
 		SetLinearVelocity(new Vector3(direction.X * speed, 0.0f, direction.Z * speed));
 	}
 	
@@ -35,8 +33,8 @@ public partial class Projectile : RigidBody3D
 		float distanceToGraviton = Position.DistanceTo(Graviton.Position);
 		if (distanceToGraviton <= Graviton.GetInfluenceRange())
 		{
-			float deltaFloat = (float)delta;
-			Vector3 pullForce = Position.DirectionTo(Graviton.Position) * Graviton.GetIntensity() * (1.0f / distanceToGraviton);
+			float deltaFloat = (float)delta * Graviton.GetIntensity();
+			Vector3 pullForce = (Position.DirectionTo(Graviton.Position) * Graviton.GetIntensity()) / distanceToGraviton;
 			Vector3 deltaForce = pullForce * new Vector3(deltaFloat, deltaFloat, deltaFloat);
 			ApplyForce(deltaForce);
 		}
@@ -56,7 +54,7 @@ public partial class Projectile : RigidBody3D
 				return;
 			}
 
-			player.DealDamage(Damage);
+			player.ReceiveDamage(Damage);
 		}
 
 		Rpc(nameof(HandleImpact));
