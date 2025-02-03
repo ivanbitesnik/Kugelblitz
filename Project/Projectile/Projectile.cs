@@ -30,6 +30,8 @@ public partial class Projectile : RigidBody3D
 
 	public override void _Process(double delta)
 	{
+		if (!IsMultiplayerAuthority()) return;
+		
 		float distanceToGraviton = Position.DistanceTo(Graviton.Position);
 		if (distanceToGraviton <= Graviton.GetInfluenceRange())
 		{
