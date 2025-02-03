@@ -3,26 +3,27 @@ using System;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace Kugelblitz.Character
 {
 	public partial class Player : CharacterBody3D
 {
 	public const float Speed = 5.0f;
-	[Export] private bool IsShootingOn = true;
 	[Export] private float DashDuration = 0.1f;
 	[Export] private float DashDistance = 50.0f;
 	[Export] private float DashCooldown = 1.0f;
 	[Export] private float ParryDuration = 0.1f;
 	[Export] private float ParryCooldown = 1.0f;
+	[Export] private float DamageReceivedFeedbackDuration = 0.5f;
+
 	public Color Color;
 	private float Health = 100.0f;
 	
-	
 	private float DashTimeLeft = 0.0f;
-	private float DashCooldownLeft = 0.0f;
-	private float ParryTimeLeft = 0.0f;
-	private float ParryCooldownLeft = 0.0f;
+	private bool bIsDashOnCooldown = false;
+	private bool bIsParrying = false;
+	private bool bIsParryOnCooldown = false;
 
 	public bool IsServer()
 	{
@@ -92,11 +93,6 @@ namespace Kugelblitz.Character
 			Vector3 dashDirection = (direction == Vector3.Zero ? -GetGlobalTransform().Basis.Z : direction);
 			velocity = ((DashDistance * (float)delta) / DashDuration) * dashDirection;
 		}
-
-		if (IsDashOnCooldown())
-		{
-			DashCooldownLeft = (float)Mathf.Clamp(DashCooldownLeft - delta, 0.0f, DashCooldownLeft);
-		}
 	}
 	
 	public override void _PhysicsProcess(double delta)
@@ -108,27 +104,9 @@ namespace Kugelblitz.Character
 		
 		MoveAndSlide();
 
-		if (Input.IsActionPressed("Fire") && IsShootingOn)
+		if (Input.IsActionPressed("Fire"))
 		{
 			TryFire();
-		}
-
-		ProcessParry(delta);
-	}
-
-	private void ProcessParry(double delta)
-	{
-		if (IsParrying())
-		{
-			ParryTimeLeft = (float)Mathf.Clamp(ParryTimeLeft - delta, 0.0f, ParryTimeLeft);
-			if (!IsParrying())
-			{
-				Rpc(nameof(EndParry));
-			}
-		}
-		else if (IsParryOnCooldown())
-		{
-			ParryCooldownLeft = (float)Mathf.Clamp(ParryCooldownLeft - delta, 0.0f, ParryCooldownLeft);
 		}
 	}
 	
@@ -173,28 +151,38 @@ namespace Kugelblitz.Character
 		}
 	}
 
-	private void StartDashing()
+	private async Task StartDashing()
 	{
 		DashTimeLeft = DashDuration;
-		DashCooldownLeft = DashCooldown;
+		bIsDashOnCooldown = true;
+		await ToSignal(GetTree().CreateTimer(DashCooldown), SceneTreeTimer.SignalName.Timeout);
+		bIsDashOnCooldown = false;
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
 	private void StartParrying()
 	{
-		ParryTimeLeft = ParryDuration;
-		ParryCooldownLeft = ParryCooldown;
-
-		GetNode<MeshInstance3D>("PlayerMesh")
-			.SetSurfaceOverrideMaterial(0, new StandardMaterial3D() { AlbedoColor = Colors.Gray });
+		StartParryTask();
 	}
 
-	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-	private void EndParry()
+	private async Task StartParryTask()
 	{
-		ParryTimeLeft = 0.0f;
+		bIsParrying = true;
+		GetNode<MeshInstance3D>("PlayerMesh")
+			.SetSurfaceOverrideMaterial(0, new StandardMaterial3D() { AlbedoColor = Colors.Gray });
+		await ToSignal(GetTree().CreateTimer(ParryDuration), SceneTreeTimer.SignalName.Timeout);
+		EndParry();
+	}
+
+	private async Task EndParry()
+	{
+		bIsParrying = false;
 		GetNode<MeshInstance3D>("PlayerMesh")
 					.SetSurfaceOverrideMaterial(0, new StandardMaterial3D() { AlbedoColor = Color });
+
+		bIsParryOnCooldown = true;
+		await ToSignal(GetTree().CreateTimer(ParryCooldown), SceneTreeTimer.SignalName.Timeout);
+		bIsParryOnCooldown = false;
 	}
 
 	private void TryFire()
@@ -219,32 +207,46 @@ namespace Kugelblitz.Character
 
 	public bool IsDashOnCooldown()
 	{
-		return DashCooldownLeft > 0.0f;
+		return bIsDashOnCooldown;
 	}
 
 	public bool IsParrying()
 	{
-		return ParryTimeLeft > 0.0f;
+		return bIsParrying;
 	}
 
 	public bool IsParryOnCooldown()
 	{
-		return ParryCooldownLeft > 0.0f;
+		return bIsParryOnCooldown;
 	}
 
 	public void ReceiveDamage(float damage)
 	{
 		Health -= damage;
-		if (Health <= 0)
-		{
-			Rpc(nameof(OnPlayerDead));
-		}
+
+		Rpc(nameof(PlayDamageFeedback), Health <= 0);
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-	private void OnPlayerDead()
+	private void PlayDamageFeedback(bool bIsDeathFeedback)
 	{
-		QueueFree();
+		if (bIsDeathFeedback)
+		{
+			QueueFree();
+		}
+		else
+		{
+			PlayDamageFeedbackTask();
+		}
+	}
+
+	private async Task PlayDamageFeedbackTask()
+	{
+		GetNode<MeshInstance3D>("PlayerMesh")
+			.SetSurfaceOverrideMaterial(0, new StandardMaterial3D() { AlbedoColor = Colors.Red });
+		await ToSignal(GetTree().CreateTimer(DamageReceivedFeedbackDuration), SceneTreeTimer.SignalName.Timeout);
+		GetNode<MeshInstance3D>("PlayerMesh")
+			.SetSurfaceOverrideMaterial(0, new StandardMaterial3D() { AlbedoColor = Color });
 	}
 }
 
