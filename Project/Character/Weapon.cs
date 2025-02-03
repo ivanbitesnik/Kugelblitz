@@ -16,11 +16,6 @@ public partial class Weapon : StaticBody3D
 	{
 		ProjectileColor = GetParent<Player>().Color;
 	}
-
-	// Called every frame. 'delta' is the elapsed time since the previous frame.
-	public override void _Process(double delta)
-	{
-	}
 	
 	public void PressTrigger()
 	{
@@ -51,7 +46,5 @@ public partial class Weapon : StaticBody3D
 		Vector3 muzzlePos = GetNode<Marker3D>("Muzzle").GlobalPosition + (direction * 3.0f);
 		projectile.Initialize(muzzlePos, direction, ProjectileSpeed, ProjectileColor);
 		GetTree().Root.AddChild(projectile);
-
-		projectile.SetMultiplayerAuthority(GetParent<Player>().GetPlayerId());
 	}
 }

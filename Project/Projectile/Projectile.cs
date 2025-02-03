@@ -4,8 +4,8 @@ using Kugelblitz.Character;
 
 public partial class Projectile : RigidBody3D
 {
-	private Color Color;
 	[Export] private float Damage;
+	private Color Color;
 	private Graviton Graviton;
 	
 	public void Initialize(Vector3 position, Vector3 direction, float speed, Color color)
@@ -31,7 +31,7 @@ public partial class Projectile : RigidBody3D
 	public override void _Process(double delta)
 	{
 		if (!IsMultiplayerAuthority()) return;
-		
+
 		float distanceToGraviton = Position.DistanceTo(Graviton.Position);
 		if (distanceToGraviton <= Graviton.GetInfluenceRange())
 		{

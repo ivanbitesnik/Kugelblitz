@@ -13,9 +13,6 @@ material = SubResource("StandardMaterial3D_hcjxv")
 properties/0/path = NodePath(".:position")
 properties/0/spawn = true
 properties/0/replication_mode = 1
-properties/1/path = NodePath(".:linear_velocity")
-properties/1/spawn = true
-properties/1/replication_mode = 1
 
 [node name="Projectile" type="RigidBody3D"]
 collision_layer = 2
