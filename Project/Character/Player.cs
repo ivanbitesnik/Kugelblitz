@@ -9,6 +9,7 @@ namespace Kugelblitz.Character
 {
 	public partial class Player : CharacterBody3D
 {
+	private Node3D HealthbarSprite;
 	public const float Speed = 5.0f;
 	[Export] private float DashDuration = 0.1f;
 	[Export] private float DashDistance = 50.0f;
@@ -57,8 +58,10 @@ namespace Kugelblitz.Character
     {
 		SetAxisLock(PhysicsServer3D.BodyAxis.LinearY, true);
 
-		SetPhysicsProcess(IsMultiplayerAuthority());
+		//SetPhysicsProcess(IsMultiplayerAuthority());
 		SetProcessInput(IsMultiplayerAuthority());
+
+		HealthbarSprite = FindChild("HealthbarSprite") as Node3D;
     }
 
     private void CalculateVelocity(double delta, Vector3 direction)
@@ -97,6 +100,9 @@ namespace Kugelblitz.Character
 	
 	public override void _PhysicsProcess(double delta)
 	{	
+		HealthbarSprite.Position = Position - new Vector3(0.0f, 0.0f, 2.0f);
+		if (!IsMultiplayerAuthority()) return;
+
 		// Get the input direction and handle the movement/deceleration.
 		Vector2 inputDir = Input.GetVector("MoveLeft", "MoveRight", "MoveUp", "MoveDown");
 		Vector3 direction = (new Vector3(inputDir.X, 0, inputDir.Y)).Normalized();
@@ -222,15 +228,14 @@ namespace Kugelblitz.Character
 
 	public void ReceiveDamage(float damage)
 	{
-		Health -= damage;
-
-		Rpc(nameof(PlayDamageFeedback), Health <= 0);
+		Rpc(nameof(PlayDamageFeedback), Health - damage);
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-	private void PlayDamageFeedback(bool bIsDeathFeedback)
+	private void PlayDamageFeedback(float NewHealth)
 	{
-		if (bIsDeathFeedback)
+		Health = NewHealth;
+		if (Health <= 0)
 		{
 			QueueFree();
 		}
@@ -242,6 +247,9 @@ namespace Kugelblitz.Character
 
 	private async Task PlayDamageFeedbackTask()
 	{
+		TextureProgressBar Healthbar = FindChild("Healthbar") as TextureProgressBar;
+		Healthbar.Value = Health;
+
 		GetNode<MeshInstance3D>("PlayerMesh")
 			.SetSurfaceOverrideMaterial(0, new StandardMaterial3D() { AlbedoColor = Colors.Red });
 		await ToSignal(GetTree().CreateTimer(DamageReceivedFeedbackDuration), SceneTreeTimer.SignalName.Timeout);
