@@ -25,6 +25,7 @@ shape = SubResource("CylinderShape3D_rqsmr")
 [node name="Graviton" parent="." instance=ExtResource("1_5gkpg")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 InfluenceRange = 20.0
+Intensity = 1e+06
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)

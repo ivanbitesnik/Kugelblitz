@@ -3,8 +3,8 @@ using System;
 
 public partial class Graviton : RigidBody3D
 {
-	[Export] private float InfluenceRange = 50.0f;
-	[Export] private float Intensity = 1000.0f;
+	[Export] private float InfluenceRange = 100.0f;
+	[Export] private float Intensity = 10000.0f;
 
 	private Area3D GravityArea = new Area3D();
 	private CollisionShape3D GravityShape = new CollisionShape3D();
