@@ -8,8 +8,11 @@ public partial class Projectile : RigidBody3D
 	[Export] private float Damage;
 	private Color Color;
 	private Graviton Graviton;
+	public float ProjectileSize = 1.0f;
+
 	private bool bReportedHit = false;
 	private bool bWaitingHitReport = false;
+	private bool bProjectileMerged = false;
 	
 	public void Initialize(Vector3 position, Vector3 direction, float speed, Color color)
 	{
@@ -40,7 +43,7 @@ public partial class Projectile : RigidBody3D
 		{
 			float deltaFloat = 1.0f/60.0f;
 			Vector3 pullForce = (Position.DirectionTo(Graviton.Position) * Graviton.GetIntensity()) / distanceToGraviton;
-			Vector3 deltaForce = pullForce * new Vector3(deltaFloat, deltaFloat, deltaFloat);
+			Vector3 deltaForce = (pullForce / Scale) * new Vector3(deltaFloat, deltaFloat, deltaFloat);
 			ApplyForce(deltaForce);
 		}
     }
@@ -49,12 +52,21 @@ public partial class Projectile : RigidBody3D
 	{
 		GD.Print("Bullet hit: ", body.Name, " Context: ", Multiplayer.GetUniqueId() == 1 ? "Server" : "Client");
 		
+		var projectile = body as Projectile;
+		if (projectile is not null)
+		{
+			if (bProjectileMerged) return;	// The other projectile merged into this one
+			projectile.MergeProjectiles(this);
+		}
+
+		// The other player reported the hit first, this one waits to simulate the hit from their pov
 		if (bWaitingHitReport)
 		{
 			QueueFree();
+			return;
 		}
 
-		if (!IsMultiplayerAuthority()) return;
+		if (!IsMultiplayerAuthority()) return;	// We trust the bullet owner to simulate and report the hit first
 		
 		var player = body as Player;
 		if (player is not null)
@@ -69,6 +81,18 @@ public partial class Projectile : RigidBody3D
 
 		bReportedHit = true;
 		Rpc(nameof(HandleImpact));
+	}
+
+	private void MergeProjectiles(Projectile otherProjectile)
+	{
+		ProjectileSize += otherProjectile.ProjectileSize / 10.0f;
+		Scale = new Vector3(ProjectileSize, ProjectileSize, ProjectileSize);
+		foreach (Node3D child in GetChildren())
+		{
+			child.Scale = Scale;
+		}
+
+		bProjectileMerged = true;
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
@@ -86,7 +110,7 @@ public partial class Projectile : RigidBody3D
 	private async Task HandleImpactTask()
 	{
 		bWaitingHitReport = true;
-		await ToSignal(GetTree().CreateTimer(0.1f), SceneTreeTimer.SignalName.Timeout);
+		await ToSignal(GetTree().CreateTimer(0.01f), SceneTreeTimer.SignalName.Timeout);
 		QueueFree();
 	}
 }

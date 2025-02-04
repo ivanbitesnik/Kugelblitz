@@ -10,7 +10,6 @@
 material = SubResource("StandardMaterial3D_hcjxv")
 
 [node name="Projectile" type="RigidBody3D"]
-collision_layer = 2
 mass = 10.0
 script = ExtResource("1_ww0lx")
 Damage = 25.0
