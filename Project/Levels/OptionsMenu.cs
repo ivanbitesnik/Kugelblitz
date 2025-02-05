@@ -7,6 +7,8 @@ public partial class OptionsMenu : Control
 
 	public void _on_return_to_menu_button_up()
 	{
+		Multiplayer.MultiplayerPeer.Close();
+		Multiplayer.MultiplayerPeer = null;
 		GetTree().ChangeSceneToPacked(MenuScene);
 	}
 

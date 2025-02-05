@@ -228,13 +228,7 @@ namespace Kugelblitz.Character
 
 	public void ReceiveDamage(float damage)
 	{
-		Rpc(nameof(PlayDamageFeedback), Health - damage);
-	}
-
-	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-	private void PlayDamageFeedback(float NewHealth)
-	{
-		Health = NewHealth;
+		Health -= damage;
 		if (Health <= 0)
 		{
 			QueueFree();

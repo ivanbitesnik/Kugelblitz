@@ -31,42 +31,53 @@ public partial class Projectile : RigidBody3D
 		SetAxisLock(PhysicsServer3D.BodyAxis.LinearY, true);
 		Graviton = GetTree().Root.GetNode<Graviton>("World/Arena/Graviton");
 
-		SetPhysicsProcess(true);
+		Timer FixedTick = new Timer();
+		FixedTick.Timeout += ProcessFixedTick;
+		FixedTick.OneShot = false;
+		FixedTick.WaitTime = 0.01f;
+		FixedTick.Autostart = true;
+		AddChild(FixedTick);
 	}
-
-    public override void _PhysicsProcess(double delta)
-    {
-        base._PhysicsProcess(delta);
-
+	
+	private void ProcessFixedTick()
+	{
 		float distanceToGraviton = Position.DistanceTo(Graviton.Position);
 		if (distanceToGraviton <= Graviton.GetInfluenceRange())
 		{
-			float deltaFloat = 1.0f/60.0f;
 			Vector3 pullForce = (Position.DirectionTo(Graviton.Position) * Graviton.GetIntensity()) / distanceToGraviton;
-			Vector3 deltaForce = (pullForce / Scale) * new Vector3(deltaFloat, deltaFloat, deltaFloat);
-			ApplyForce(deltaForce);
+			ApplyForce(pullForce / Scale);
 		}
-    }
+	}
 
     private void _on_body_entered(Node body)
 	{
-		GD.Print("Bullet hit: ", body.Name, " Context: ", Multiplayer.GetUniqueId() == 1 ? "Server" : "Client");
-		
-		var projectile = body as Projectile;
-		if (projectile is not null)
-		{
-			if (bProjectileMerged) return;	// The other projectile merged into this one
-			projectile.MergeProjectiles(this);
-		}
-
-		// The other player reported the hit first, this one waits to simulate the hit from their pov
+		// The instigator reported the hit first, the observer awaits to simulate the hit from their pov
 		if (bWaitingHitReport)
 		{
 			QueueFree();
 			return;
 		}
 
-		if (!IsMultiplayerAuthority()) return;	// We trust the bullet owner to simulate and report the hit first
+		if (!IsMultiplayerAuthority()) return;	// We trust the instigator to simulate and report the hit first
+
+		bReportedHit = true;
+		Rpc(nameof(HandleImpact), body.GetPath());
+	}
+
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+	private void HandleImpact(string bodyPath)
+	{	
+		Node body = GetTree().Root.GetNode(bodyPath);
+		if (body is null) DebugManager.PrintString(this, "Invalid body path, " + bodyPath, 10.0f);
+		
+
+		var projectile = body as Projectile;
+		if (projectile is not null)
+		{
+			if (bProjectileMerged) return;	// The other projectile merged into this one
+			projectile.MergeProjectiles(this);
+		}
 		
 		var player = body as Player;
 		if (player is not null)
@@ -79,25 +90,6 @@ public partial class Projectile : RigidBody3D
 			player.ReceiveDamage(Damage);
 		}
 
-		bReportedHit = true;
-		Rpc(nameof(HandleImpact));
-	}
-
-	private void MergeProjectiles(Projectile otherProjectile)
-	{
-		ProjectileSize += otherProjectile.ProjectileSize / 10.0f;
-		Scale = new Vector3(ProjectileSize, ProjectileSize, ProjectileSize);
-		foreach (Node3D child in GetChildren())
-		{
-			child.Scale = Scale;
-		}
-
-		bProjectileMerged = true;
-	}
-
-	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-	private void HandleImpact()
-	{	
 		if (!bReportedHit)
 		{
 			HandleImpactTask();
@@ -112,5 +104,18 @@ public partial class Projectile : RigidBody3D
 		bWaitingHitReport = true;
 		await ToSignal(GetTree().CreateTimer(0.01f), SceneTreeTimer.SignalName.Timeout);
 		QueueFree();
+	}
+
+	private void MergeProjectiles(Projectile otherProjectile)
+	{
+		ProjectileSize += otherProjectile.ProjectileSize / 10.0f;
+		Scale = new Vector3(ProjectileSize, ProjectileSize, ProjectileSize);
+		foreach (Node child in GetChildren())
+		{
+			Node3D child3D = child as Node3D;
+			if (child3D is not null) child3D.Scale = Scale;
+		}
+
+		bProjectileMerged = true;
 	}
 }
