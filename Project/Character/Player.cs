@@ -18,30 +18,24 @@ namespace Kugelblitz.Character
 	[Export] private float ParryCooldown = 1.0f;
 	[Export] private float DamageReceivedFeedbackDuration = 0.5f;
 
+	private int PlayerId {get; set;} = 0;//this is set on _EnterTree
 	public Color Color;
 	private float Health = 100.0f;
 	
 	private float DashTimeLeft = 0.0f;
-	private bool bIsDashOnCooldown = false;
-	private bool bIsParrying = false;
-	private bool bIsParryOnCooldown = false;
+	public bool IsDashOnCooldown {get; private set;} = false;
+	public bool IsParrying {get; private set;} = false;
+	public bool IsParryOnCooldown {get; private set;} = false;
 
-	public bool IsServer()
-	{
-		return GetPlayerId() == 1;
-	}
-
-	public int GetPlayerId()
-	{
-		return int.Parse(Name);
-	}
+	public bool IsServer() => PlayerId == 1;
 
 	public override void _EnterTree()
 	{
-		SetMultiplayerAuthority(GetPlayerId());
+		SetMultiplayerAuthority(PlayerId);
 		string contextString = Multiplayer.IsServer() ? "Server" : "Client";
 		GD.Print("Character spawned, ID: ", Name, ", Context: ", contextString);
-		
+
+		PlayerId = int.Parse(Name); //this should be done before any isServer for it to work properly
 		Position = IsServer() ? GetTree().Root.GetNode<Marker3D>("World/Arena/PlayerOneSpawnPoint").Position : GetTree().Root.GetNode<Marker3D>("World/Arena/PlayerTwoSpawnPoint").Position;
         
 		Color = IsServer() ? Colors.Blue : Colors.Green;
@@ -125,7 +119,7 @@ namespace Kugelblitz.Character
 
 		if (@event.IsActionPressed("dash"))
 		{
-			if (!IsDashOnCooldown())
+			if (!IsDashOnCooldown)
 			{
 				StartDashing();
 			}
@@ -133,7 +127,7 @@ namespace Kugelblitz.Character
 
 		if (@event.IsActionPressed("Parry"))
 		{
-			if (!IsParryOnCooldown())
+			if (!IsParryOnCooldown)
 			{
 				Rpc(nameof(StartParrying));
 			}
@@ -160,9 +154,9 @@ namespace Kugelblitz.Character
 	private async Task StartDashing()
 	{
 		DashTimeLeft = DashDuration;
-		bIsDashOnCooldown = true;
+		IsDashOnCooldown = true;
 		await ToSignal(GetTree().CreateTimer(DashCooldown), SceneTreeTimer.SignalName.Timeout);
-		bIsDashOnCooldown = false;
+		IsDashOnCooldown = false;
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
@@ -173,7 +167,7 @@ namespace Kugelblitz.Character
 
 	private async Task StartParryTask()
 	{
-		bIsParrying = true;
+		IsParrying = true;
 		GetNode<MeshInstance3D>("PlayerMesh")
 			.SetSurfaceOverrideMaterial(0, new StandardMaterial3D() { AlbedoColor = Colors.Gray });
 		await ToSignal(GetTree().CreateTimer(ParryDuration), SceneTreeTimer.SignalName.Timeout);
@@ -182,13 +176,13 @@ namespace Kugelblitz.Character
 
 	private async Task EndParry()
 	{
-		bIsParrying = false;
+		IsParrying = false;
 		GetNode<MeshInstance3D>("PlayerMesh")
 					.SetSurfaceOverrideMaterial(0, new StandardMaterial3D() { AlbedoColor = Color });
 
-		bIsParryOnCooldown = true;
+		IsParryOnCooldown = true;
 		await ToSignal(GetTree().CreateTimer(ParryCooldown), SceneTreeTimer.SignalName.Timeout);
-		bIsParryOnCooldown = false;
+		IsParryOnCooldown = false;
 	}
 
 	private void TryFire()
@@ -210,22 +204,6 @@ namespace Kugelblitz.Character
 	{
 		return DashTimeLeft > 0.0f;
 	}
-
-	public bool IsDashOnCooldown()
-	{
-		return bIsDashOnCooldown;
-	}
-
-	public bool IsParrying()
-	{
-		return bIsParrying;
-	}
-
-	public bool IsParryOnCooldown()
-	{
-		return bIsParryOnCooldown;
-	}
-
 	public void ReceiveDamage(float damage)
 	{
 		Health -= damage;

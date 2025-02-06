@@ -9,9 +9,9 @@ public partial class Projectile : RigidBody3D
 	private Color Color;
 	public float ProjectileSize = 1.0f;
 
-	private bool bReportedHit = false;
-	private bool bWaitingHitReport = false;
-	private bool bProjectileMerged = false;
+	public bool HasReportedHit {get; private set;}= false;
+	public bool IsWaitingHitReport {get; private set;}= false;
+	public bool IsProjectileMerged {get; private set;}= false;
 	
 	public void Initialize(Vector3 position, Vector3 direction, float speed, Color color)
 	{
@@ -43,7 +43,7 @@ public partial class Projectile : RigidBody3D
 		var projectile = otherBody as Projectile;
 		if (projectile is not null)
 		{
-			if (bProjectileMerged) return;	// The other projectile merged into this one
+			if (IsProjectileMerged) return;	// The other projectile merged into this one
 			projectile.Rpc(nameof(MergeProjectiles), ProjectileSize);
 			return;
 		}
@@ -51,7 +51,7 @@ public partial class Projectile : RigidBody3D
 		var player = otherBody as Player;
 		if (player is not null)
 		{
-			if (player.IsParrying()) return;
+			if (player.IsParrying) return;
 			Rpc(nameof(ApplyDamage), player.GetPath());
 			return;
 		}
@@ -70,7 +70,7 @@ public partial class Projectile : RigidBody3D
 			if (child3D is not null) child3D.Scale = Scale;
 		}
 
-		bProjectileMerged = true;
+		IsProjectileMerged = true;
 
 		DestroyProjectile();
 	}
