@@ -12,6 +12,7 @@ public partial class World : Node3D
 	
 	private Godot.Collections.Array<long> PlayerIds = new Godot.Collections.Array<long>();
 	private Node OptionsMenuInstance;
+	private Timer ResetGameTimer = new Timer();
 
 	public override void _Ready()
 	{
@@ -26,6 +27,11 @@ public partial class World : Node3D
 
 		Multiplayer.PeerDisconnected += PeerDisconnected;
 		Multiplayer.ServerDisconnected += ServerDisconnected;
+
+		ResetGameTimer.OneShot = true;
+		ResetGameTimer.Autostart = false;
+		ResetGameTimer.WaitTime = 3.0f;
+		AddChild(ResetGameTimer);
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
@@ -88,12 +94,14 @@ public partial class World : Node3D
 
 	private void ResetGame()
 	{
+		if (ResetGameTimer.TimeLeft > 0.0f) return;
 		ResetGameTask();
 	}
 
 	private async Task ResetGameTask()
 	{
-		await ToSignal(GetTree().CreateTimer(3.0f), SceneTreeTimer.SignalName.Timeout);
+		ResetGameTimer.Start();
+		await ToSignal(ResetGameTimer, SceneTreeTimer.SignalName.Timeout);
 		foreach (long id in PlayerIds)
 		{
 			Rpc(nameof(RemovePlayer), id);
@@ -104,9 +112,10 @@ public partial class World : Node3D
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
 	private void RemovePlayer(long playerId)
 	{
-		Node player = FindChild(playerId.ToString());
+		Node player = FindChild(playerId.ToString(), true, false);
 		if (player is not null)
 		{
+			player.Name = "PendingDestroyPlayer"; // We change the name so that its not taken when spawning a new one
 			player.QueueFree();
 		}
 	}
