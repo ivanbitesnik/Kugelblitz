@@ -19,6 +19,9 @@ namespace Kugelblitz.Character
 	[Export] private float ParryCooldown = 1.0f;
 	[Export] private float DamageReceivedFeedbackDuration = 0.5f;
 
+	[Signal]
+	public delegate void OnPlayerDeadEventHandler();
+
 	public int PlayerId {get; private set;} = 0;//this is set on _EnterTree
 	public Color Color;
 	private float Health = 100.0f;
@@ -199,6 +202,7 @@ namespace Kugelblitz.Character
 		if (Health <= 0)
 		{
 			QueueFree();
+			EmitSignal(nameof(OnPlayerDead));
 		}
 		else
 		{
