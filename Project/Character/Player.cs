@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Formats.Asn1;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
@@ -18,24 +19,26 @@ namespace Kugelblitz.Character
 	[Export] private float ParryCooldown = 1.0f;
 	[Export] private float DamageReceivedFeedbackDuration = 0.5f;
 
-	private int PlayerId {get; set;} = 0;//this is set on _EnterTree
+	public int PlayerId {get; private set;} = 0;//this is set on _EnterTree
 	public Color Color;
 	private float Health = 100.0f;
-	
 	private float DashTimeLeft = 0.0f;
 	public bool IsDashOnCooldown {get; private set;} = false;
 	public bool IsParrying {get; private set;} = false;
 	public bool IsParryOnCooldown {get; private set;} = false;
-
 	public bool IsServer() => PlayerId == 1;
+	public bool IsDashing() => DashTimeLeft > 0.0f;
+	public Weapon GetWeapon() => GetNode<Weapon>("Weapon");
+	public Camera3D GetCamera() => GetTree().Root.GetNode<Camera3D>("World/Camera");
 
 	public override void _EnterTree()
 	{
+		PlayerId = int.Parse(Name); //this should be done before any use of PlayerId :P
+		
 		SetMultiplayerAuthority(PlayerId);
 		string contextString = Multiplayer.IsServer() ? "Server" : "Client";
 		GD.Print("Character spawned, ID: ", Name, ", Context: ", contextString);
 
-		PlayerId = int.Parse(Name); //this should be done before any isServer for it to work properly
 		Position = IsServer() ? GetTree().Root.GetNode<Marker3D>("World/Arena/PlayerOneSpawnPoint").Position : GetTree().Root.GetNode<Marker3D>("World/Arena/PlayerTwoSpawnPoint").Position;
         
 		Color = IsServer() ? Colors.Blue : Colors.Green;
@@ -189,21 +192,7 @@ namespace Kugelblitz.Character
 	{
 		GetWeapon().PressTrigger();
 	}
-	
-	public Weapon GetWeapon()
-	{
-		return GetNode<Weapon>("Weapon");
-	}
 
-	public Camera3D GetCamera()
-	{
-		return GetTree().Root.GetNode<Camera3D>("World/Camera");
-	}
-
-	public bool IsDashing()
-	{
-		return DashTimeLeft > 0.0f;
-	}
 	public void ReceiveDamage(float damage)
 	{
 		Health -= damage;

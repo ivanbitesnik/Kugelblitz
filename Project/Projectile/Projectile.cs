@@ -44,6 +44,7 @@ public partial class Projectile : RigidBody3D
 		if (projectile is not null)
 		{
 			if (IsProjectileMerged) return;	// The other projectile merged into this one
+			//TODO: creo que le pifie con el nombre de la variable @acheto
 			projectile.Rpc(nameof(MergeProjectiles), ProjectileSize);
 			return;
 		}
@@ -51,7 +52,11 @@ public partial class Projectile : RigidBody3D
 		var player = otherBody as Player;
 		if (player is not null)
 		{
-			if (player.IsParrying) return;
+			if (player.IsParrying) 
+			{	
+				// ProjectileGetsParried();
+				return;
+			}
 			Rpc(nameof(ApplyDamage), player.GetPath());
 			return;
 		}
