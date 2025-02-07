@@ -5,6 +5,7 @@
 .idea/
 /Project/*.user
 /Project/.godot/*
+/Builds/
 
 # Godot 4+ specific ignores
 .godot/
