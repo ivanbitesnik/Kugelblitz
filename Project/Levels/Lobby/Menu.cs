@@ -234,7 +234,7 @@ public partial class Menu : Node
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
 	private void TravelToWorld()
 	{
-		LeaveLobby(false);
+		LeaveLobby();
 		GetTree().ChangeSceneToPacked(WorldScene);
 	}
 
@@ -248,13 +248,8 @@ public partial class Menu : Node
 		}
 	}
 
-	public void LeaveLobby(bool bClosePeerConnection = true)
+	public void LeaveLobby()
 	{
-		if (bClosePeerConnection)
-		{
-			Multiplayer.MultiplayerPeer = null;
-		}
-
 		if (lobby_id != 0)
 		{
 			SteamStatic.LeaveLobby(lobby_id);
