@@ -57,22 +57,27 @@ public partial class World : Node3D
 		}
 	}
 
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+	public void OnPeerReturnedToMenu(int peerId)
+	{
+		if (Multiplayer.IsServer())
+		{
+			Multiplayer.MultiplayerPeer.DisconnectPeer(peerId);
+		}
+	}
+
 	// Called on any context for disconnected peer
 	private void PeerDisconnected(long id)
 	{
-		string contextString = IsMultiplayerAuthority() ? "Server" : "Client";
-		GD.Print("Peer disconnected ID: ", id.ToString(), ", Context: ", contextString);
-
 		if (Multiplayer.IsServer())
 		{
-			TravelToMenu();
+			Rpc(nameof(RemovePlayer), id);
 		}
 	}
 
 	private void ServerDisconnected()
 	{
 		GD.Print("Server disconnected");
-		QueueFree();
 		TravelToMenu();
 	}
 
@@ -120,11 +125,8 @@ public partial class World : Node3D
 		}
 	}
 
-	private void TravelToMenu()
+	public void TravelToMenu()
 	{
-		Multiplayer.MultiplayerPeer.Close();
-		Multiplayer.MultiplayerPeer = null;
-		QueueFree();
 		GetTree().ChangeSceneToPacked(MenuScene);
 	}
 

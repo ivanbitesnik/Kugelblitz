@@ -16,6 +16,7 @@ public partial class Menu : Node
 	private Control MenuContainer;
 	private SteamInfoContainer SteamInfoContainer;
 	private LobbyContainer LobbyContainer;
+	private StagingScreen StagingScreen;
 	private LineEdit IPField;
 	private ulong lobby_id = 0;
 
@@ -36,6 +37,10 @@ public partial class Menu : Node
 		LobbyContainer = GetNode<LobbyContainer>("LobbyContainer");
 		LobbyContainer.Hide();
 		LobbyContainer.BackToMenuButton.ButtonUp += OnBackToMenuPressed;
+
+		StagingScreen = GetNode<StagingScreen>("StagingScreen");
+		StagingScreen.Hide();
+		StagingScreen.OnAllPlayersReady += TravelToWorld;
 
 		SteamStatic.InitRelayNetworkAccess();
 
@@ -66,7 +71,14 @@ public partial class Menu : Node
 	{
 		DebugManager.PrintString(this, "Connected to server, ID: " + Multiplayer.GetUniqueId().ToString(), 10.0f);
 
-		Rpc(nameof(TravelToWorld));
+		if (SteamStatic.IsSteamRunning())
+		{
+			Rpc(nameof(LoadStagingArea));
+		}
+		else
+		{
+			Rpc(nameof(TravelToWorld));
+		}
 	}
 
 	private void ConnectionFailed()
@@ -90,7 +102,6 @@ public partial class Menu : Node
 			Error err = peer.CreateServer(PORT, 2);
 			Multiplayer.MultiplayerPeer = peer;
 
-			GD.Print("Waiting for players...");
 			MenuContainer.Hide();
 			SteamInfoContainer.Show();
 			return;
@@ -113,8 +124,10 @@ public partial class Menu : Node
 			SteamStatic.SetLobbyOwner(lobby_id, SteamStatic.GetSteamID());
 			SteamStatic.SetLobbyJoinable(lobby_id, true);
 
-			string steamName = SteamStatic.GetFriendPersonaName(SteamStatic.GetSteamID());
+			
+			string steamName = SteamStatic.GetPersonaName();
 			SteamStatic.SetLobbyData(lobby_id, "name", steamName + "'s Lobby");
+			SteamStatic.SetLobbyMemberData(lobbyId, "name", steamName);
 
 			SteamInfoContainer.Initialize();
 
@@ -183,6 +196,7 @@ public partial class Menu : Node
 		if (Response == ChatRoomEnterResponse.Success)
 		{
 			lobby_id = lobbyId;
+			SteamStatic.SetLobbyMemberData(lobby_id, "name", SteamStatic.GetPersonaName());
 			P2PFunctionLibraryNode.Call("CreateClientPeer", SteamStatic.GetLobbyOwner(lobby_id));
 
 			Multiplayer.ConnectionFailed += ConnectionFailed;
@@ -207,6 +221,17 @@ public partial class Menu : Node
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+	private void LoadStagingArea()
+	{
+		MenuContainer.Hide();
+		LobbyContainer.Hide();
+		SteamInfoContainer.Hide();
+
+		StagingScreen.Initialize(lobby_id);
+		StagingScreen.Show();
+	}
+
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
 	private void TravelToWorld()
 	{
 		LeaveLobby(false);
@@ -227,7 +252,6 @@ public partial class Menu : Node
 	{
 		if (bClosePeerConnection)
 		{
-			if (Multiplayer.MultiplayerPeer is not null) Multiplayer.MultiplayerPeer.Close();
 			Multiplayer.MultiplayerPeer = null;
 		}
 

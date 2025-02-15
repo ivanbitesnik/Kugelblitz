@@ -21,9 +21,6 @@ public partial class SteamInfoContainer : VBoxContainer
 	public override void _Ready()
 	{	
 		SteamInitResult result = SteamStatic.SteamInit();
-		string steamInitResult = "Steam init result: " + result.Status.ToString();
-		GD.Print(steamInitResult);
-		DebugManager.PrintString(this, steamInitResult, 10.0f);
 
 		CloseLobbyButton.SizeFlagsHorizontal = SizeFlags.ExpandFill;
 		CloseLobbyButton.Text = "Close lobby";
@@ -51,6 +48,9 @@ public partial class SteamInfoContainer : VBoxContainer
     public override void _Process(double delta)
     {
         base._Process(delta);
-		SteamStatic.RunCallbacks();
+		if (SteamStatic.IsSteamRunning())
+		{
+			SteamStatic.RunCallbacks();
+		}
     }
 }
