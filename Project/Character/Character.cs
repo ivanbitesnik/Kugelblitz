@@ -5,7 +5,10 @@ using System.Threading.Tasks;
 public partial class Character : CharacterBody3D
 {
 	public const float Speed = 5.0f;
+	public const float BackwardsSpeed = 2.5f;
 	public const float SprintSpeed = 10.0f;
+	public const float CrouchSpeed = 2.0f;
+	public const float BackwardsCrouchSpeed = 1.0f;
 	public const float JumpVelocity = 4.5f;
 
 	[Signal]

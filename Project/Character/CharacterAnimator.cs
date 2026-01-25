@@ -6,6 +6,8 @@ public partial class CharacterAnimator : AnimationPlayer
 	[Export] private string IdleAnimation = "Idle";
 	[Export] private string WalkAnimation = "Walk";
 	[Export] private string SprintAnimation = "Sprint";
+	[Export] private string CrouchAnimation = "Crouch_Idle";
+	[Export] private string CrouchMoveAnimation = "Crouch_Fwd";
 	[Export] private string JumpStartAnimation = "Jump_Start";
 	[Export] private string FallAnimation = "Jump";
 	[Export] private string JumpLandAnimation = "Jump_Land";
@@ -22,11 +24,19 @@ public partial class CharacterAnimator : AnimationPlayer
 		AnimationFinished += OnAnimationFinished;
 	}
 
+	private void SetAnimation(string animation)
+    {
+        if (CurrentAnimation != animation)
+        {
+			CurrentAnimation = animation;
+        }
+    }
+
 	private void OnAnimationFinished(StringName animation)
 	{
 		if (animation == JumpStartAnimation)
 		{
-			CurrentAnimation = FallAnimation;
+			SetAnimation(FallAnimation);
 		}
 		else if (animation == JumpLandAnimation)
         {
@@ -36,13 +46,13 @@ public partial class CharacterAnimator : AnimationPlayer
 	
 	private void OnCharacterJumped()
 	{
-		CurrentAnimation = JumpStartAnimation;
+		SetAnimation(JumpStartAnimation);
 		bIsJumping = true;
 	}
 	
 	private void OnCharacterLanded()
     {
-		CurrentAnimation = JumpLandAnimation;
+		SetAnimation(JumpLandAnimation);
     }
 
 	// Called every frame. 'delta' is the elapsed time since the previous frame.
@@ -57,29 +67,34 @@ public partial class CharacterAnimator : AnimationPlayer
 
 		if (character.Velocity.Y < 0.0f)
         {
-			CurrentAnimation = FallAnimation;
+			SetAnimation(FallAnimation);
 			return;
         }
 
 		if (character.Velocity.X == 0.0f && character.Velocity.Z == 0.0f)
 		{
-			if (CurrentAnimation != IdleAnimation)
+			if (Input.IsActionPressed("Crouch"))
+            {
+				SetAnimation(CrouchAnimation);
+            }
+			else
 			{
-				CurrentAnimation = IdleAnimation;
+				SetAnimation(IdleAnimation);
 			}
 		}
 		else
 		{
-			if (Input.IsActionPressed("Sprint"))
+			if (Input.IsActionPressed("Crouch"))
 			{
-				if (CurrentAnimation != SprintAnimation)
-                {
-					CurrentAnimation = SprintAnimation;
-                }
+				SetAnimation(CrouchMoveAnimation);
             }
-			else if (CurrentAnimation != WalkAnimation)
+			else if (Input.IsActionPressed("Sprint") && Input.GetVector("MoveLeft", "MoveRight", "MoveUp", "MoveDown").Y < 0.0f)
 			{
-				CurrentAnimation = WalkAnimation;
+				SetAnimation(SprintAnimation);
+            }
+			else
+			{
+				SetAnimation(WalkAnimation);
 			}
 		}
     }
