@@ -1,6 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://cviq6wtmeogyt"]
+[gd_scene load_steps=7 format=3 uid="uid://cviq6wtmeogyt"]
 
 [ext_resource type="Script" path="res://Projectile/Projectile.cs" id="1_ww0lx"]
+[ext_resource type="Shader" path="res://Shaders/ps1_visuals.gdshader" id="2_82syw"]
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_tmvjn"]
 
@@ -8,6 +9,14 @@
 
 [sub_resource type="SphereMesh" id="SphereMesh_5txh7"]
 material = SubResource("StandardMaterial3D_hcjxv")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_n3jx8"]
+render_priority = 0
+shader = ExtResource("2_82syw")
+shader_parameter/affine_mapping = false
+shader_parameter/alpha_scissor = 0.5
+shader_parameter/jitter = 0.25
+shader_parameter/resolution = Vector2i(320, 240)
 
 [node name="Projectile" type="RigidBody3D"]
 script = ExtResource("1_ww0lx")
@@ -18,5 +27,6 @@ shape = SubResource("SphereShape3D_tmvjn")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 mesh = SubResource("SphereMesh_5txh7")
+surface_material_override/0 = SubResource("ShaderMaterial_n3jx8")
 
 [connection signal="body_entered" from="." to="." method="_on_body_entered"]

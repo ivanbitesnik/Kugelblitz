@@ -1,0 +1,19 @@
+[gd_resource type="ShaderMaterial" load_steps=4 format=3 uid="uid://777bmm3fg762"]
+
+[ext_resource type="Shader" path="res://Shaders/ps1_visuals.gdshader" id="1_xjv1v"]
+
+[sub_resource type="Curve" id="Curve_3ibkj"]
+_data = [Vector2(0, 0.604396), 0.0, 0.0, 0, 0]
+point_count = 1
+
+[sub_resource type="CurveXYZTexture" id="CurveXYZTexture_behkw"]
+curve_y = SubResource("Curve_3ibkj")
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_xjv1v")
+shader_parameter/affine_mapping = false
+shader_parameter/alpha_scissor = 0.5
+shader_parameter/jitter = 0.5
+shader_parameter/resolution = Vector2i(160, 160)
+shader_parameter/albedo = SubResource("CurveXYZTexture_behkw")

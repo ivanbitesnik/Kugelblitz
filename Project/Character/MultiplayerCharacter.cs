@@ -5,26 +5,24 @@ using System.Linq;
 using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
+using System.Transactions;
 
-namespace Kugelblitz.Character
-{
-	public partial class Player : CharacterBody3D
+public partial class MultiplayerCharacter : Character
 {
 	private Node3D HealthbarSprite;
-	public const float Speed = 5.0f;
 	[Export] private float DashDuration = 0.1f;
 	[Export] private float DashDistance = 50.0f;
 	[Export] private float DashCooldown = 1.0f;
 	[Export] private float ParryDuration = 0.1f;
 	[Export] private float ParryCooldown = 1.0f;
 	[Export] private float DamageReceivedFeedbackDuration = 0.5f;
-
-	[Signal]
-	public delegate void OnPlayerDeadEventHandler();
+	[Export] private Material Player1ColorMaterial;
+	[Export] private Material Player2ColorMaterial;
+	[Export] private Material DamagedMaterial;
+	[Export] private Material ParryingMaterial;
 
 	public int PlayerId {get; private set;} = 0;//this is set on _EnterTree
-	public Color Color;
-	private float Health = 100.0f;
+	public Material ColorMaterial;
 	private float DashTimeLeft = 0.0f;
 	public bool IsDashOnCooldown {get; private set;} = false;
 	public bool IsParrying {get; private set;} = false;
@@ -32,7 +30,7 @@ namespace Kugelblitz.Character
 	public bool IsServer() => PlayerId == 1;
 	public bool IsDashing() => DashTimeLeft > 0.0f;
 	public Weapon GetWeapon() => GetNode<Weapon>("Weapon");
-	public Camera3D GetCamera() => GetTree().Root.GetNode<Camera3D>("World/Camera");
+	public Camera3D GetCamera() => GetTree().Root.GetNode<Camera3D>("World/Map/Camera3D");
 
 	public override void _EnterTree()
 	{
@@ -42,11 +40,10 @@ namespace Kugelblitz.Character
 		string contextString = Multiplayer.IsServer() ? "Server" : "Client";
 		GD.Print("Character spawned, ID: ", Name, ", Context: ", contextString);
 
-		Position = IsServer() ? GetTree().Root.GetNode<Marker3D>("World/Arena/PlayerOneSpawnPoint").Position : GetTree().Root.GetNode<Marker3D>("World/Arena/PlayerTwoSpawnPoint").Position;
-        
-		Color = IsServer() ? Colors.Blue : Colors.Green;
-		GetNode<MeshInstance3D>("PlayerMesh")
-			.SetSurfaceOverrideMaterial(0, new StandardMaterial3D() { AlbedoColor = Color });
+		Position = IsServer() ? GetTree().Root.GetNode<Marker3D>("World/Map/PlayerOneSpawnPoint").Position : GetTree().Root.GetNode<Marker3D>("World/Map/PlayerTwoSpawnPoint").Position;
+
+		ColorMaterial = IsServer() ? Player1ColorMaterial : Player2ColorMaterial;
+		GetNode<MeshInstance3D>("PlayerMesh").SetSurfaceOverrideMaterial(0, ColorMaterial);
 	}
 
 	public override void _ExitTree()
@@ -174,8 +171,7 @@ namespace Kugelblitz.Character
 	private async Task StartParryTask()
 	{
 		IsParrying = true;
-		GetNode<MeshInstance3D>("PlayerMesh")
-			.SetSurfaceOverrideMaterial(0, new StandardMaterial3D() { AlbedoColor = Colors.Gray });
+		GetNode<MeshInstance3D>("PlayerMesh").SetSurfaceOverrideMaterial(0, ParryingMaterial);
 		await ToSignal(GetTree().CreateTimer(ParryDuration), SceneTreeTimer.SignalName.Timeout);
 		EndParry();
 	}
@@ -183,9 +179,7 @@ namespace Kugelblitz.Character
 	private async Task EndParry()
 	{
 		IsParrying = false;
-		GetNode<MeshInstance3D>("PlayerMesh")
-					.SetSurfaceOverrideMaterial(0, new StandardMaterial3D() { AlbedoColor = Color });
-
+		GetNode<MeshInstance3D>("PlayerMesh").SetSurfaceOverrideMaterial(0, ColorMaterial);
 		IsParryOnCooldown = true;
 		await ToSignal(GetTree().CreateTimer(ParryCooldown), SceneTreeTimer.SignalName.Timeout);
 		IsParryOnCooldown = false;
@@ -196,15 +190,10 @@ namespace Kugelblitz.Character
 		GetWeapon().PressTrigger();
 	}
 
-	public void ReceiveDamage(float damage)
+	public override void ReceiveDamage(float damage)
 	{
-		Health -= damage;
-		if (Health <= 0)
-		{
-			QueueFree();
-			EmitSignal(nameof(OnPlayerDead));
-		}
-		else
+		base.ReceiveDamage(damage);
+		if (Health > 0)
 		{
 			PlayDamageFeedbackTask();
 		}
@@ -215,12 +204,8 @@ namespace Kugelblitz.Character
 		TextureProgressBar Healthbar = FindChild("Healthbar") as TextureProgressBar;
 		Healthbar.Value = Health;
 
-		GetNode<MeshInstance3D>("PlayerMesh")
-			.SetSurfaceOverrideMaterial(0, new StandardMaterial3D() { AlbedoColor = Colors.Red });
+		GetNode<MeshInstance3D>("PlayerMesh").SetSurfaceOverrideMaterial(0, DamagedMaterial);
 		await ToSignal(GetTree().CreateTimer(DamageReceivedFeedbackDuration), SceneTreeTimer.SignalName.Timeout);
-		GetNode<MeshInstance3D>("PlayerMesh")
-			.SetSurfaceOverrideMaterial(0, new StandardMaterial3D() { AlbedoColor = Color });
+		GetNode<MeshInstance3D>("PlayerMesh").SetSurfaceOverrideMaterial(0, ColorMaterial);
 	}
-}
-
 }

@@ -1,0 +1,10 @@
+[gd_scene load_steps=4 format=3 uid="uid://d2tafldgaqt5h"]
+
+[ext_resource type="Script" path="res://Levels/Worlds/SingleplayerWorld.cs" id="1_jeuhp"]
+[ext_resource type="PackedScene" uid="uid://byhwcaqtvwlp7" path="res://Maps/SinglePlayerMap.tscn" id="2_jsqq0"]
+[ext_resource type="PackedScene" uid="uid://m5hiiw2pxurg" path="res://Character/SingleplayerCharacter.tscn" id="3_oaouh"]
+
+[node name="SinglePlayerWorld" type="Node3D"]
+script = ExtResource("1_jeuhp")
+MapScene = ExtResource("2_jsqq0")
+PlayerScene = ExtResource("3_oaouh")

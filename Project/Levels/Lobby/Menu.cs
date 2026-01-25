@@ -6,7 +6,9 @@ using System.Net.Sockets;
 
 public partial class Menu : Node
 {
-	private PackedScene WorldScene = GD.Load<PackedScene>("res://Levels/world.tscn");
+	[Export] private PackedScene MultiplayerWorldScene = GD.Load<PackedScene>("res://Levels/Worlds/MultiplayerWorld.tscn");
+	[Export] private PackedScene SinglePlayerWorldScene = GD.Load<PackedScene>("res://Levels/Worlds/SingleplayerWorld.tscn");
+	
 	private GDScript P2PFunctionLibrary = GD.Load<GDScript>("res://Levels/Lobby/P2PFunctionLibrary.gd");
 	private Node P2PFunctionLibraryNode;
 
@@ -40,7 +42,7 @@ public partial class Menu : Node
 
 		StagingScreen = GetNode<StagingScreen>("StagingScreen");
 		StagingScreen.Hide();
-		StagingScreen.OnAllPlayersReady += TravelToWorld;
+		StagingScreen.OnAllPlayersReady += TravelToMultiplayerWorld;
 
 		SteamStatic.InitRelayNetworkAccess();
 
@@ -77,7 +79,7 @@ public partial class Menu : Node
 		}
 		else
 		{
-			Rpc(nameof(TravelToWorld));
+			Rpc(nameof(TravelToMultiplayerWorld));
 		}
 	}
 
@@ -93,6 +95,11 @@ public partial class Menu : Node
 		IPField.PlaceholderText = "Invalid IP!";
 		MenuContainer.Show();
 	}
+
+	private void _on_single_player_pressed()
+    {
+		TravelToSinglePlayerWorld();
+    }
 
 	private void _on_host_pressed()
 	{
@@ -232,11 +239,17 @@ public partial class Menu : Node
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-	private void TravelToWorld()
+	private void TravelToMultiplayerWorld()
 	{
 		LeaveLobby();
-		GetTree().ChangeSceneToPacked(WorldScene);
+		GetTree().ChangeSceneToPacked(MultiplayerWorldScene);
 	}
+
+	private void TravelToSinglePlayerWorld()
+    {
+		LeaveLobby();
+		GetTree().ChangeSceneToPacked(SinglePlayerWorldScene);
+    }
 
 	public override void _Notification(int what)
 	{

@@ -1,21 +1,16 @@
 using Godot;
 using System;
-using Kugelblitz.Character;
 using System.Threading.Tasks;
 using System.Collections.ObjectModel;
 
-public partial class World : Node3D
-{
-	private PackedScene MenuScene = GD.Load<PackedScene>("res://Levels/Lobby/menu.tscn");
-	private PackedScene OptionsScene = GD.Load<PackedScene>("res://Levels/OptionsMenu.tscn");
-	private PackedScene PlayerScene = GD.Load<PackedScene>("res://Character/player.tscn");
-	
+public partial class MultiplayerWorld : World
+{	
 	private Godot.Collections.Array<long> PlayerIds = new Godot.Collections.Array<long>();
-	private Node OptionsMenuInstance;
-	private Timer ResetGameTimer = new Timer();
 
 	public override void _Ready()
 	{
+		base._Ready();
+
 		//Input.SetMouseMode(Input.MouseModeEnum.Confined);
 
 		SetMultiplayerAuthority(1);
@@ -27,34 +22,12 @@ public partial class World : Node3D
 
 		Multiplayer.PeerDisconnected += PeerDisconnected;
 		Multiplayer.ServerDisconnected += ServerDisconnected;
-
-		ResetGameTimer.OneShot = true;
-		ResetGameTimer.Autostart = false;
-		ResetGameTimer.WaitTime = 3.0f;
-		AddChild(ResetGameTimer);
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
 	private void SendClientData(long id)
 	{
 		SpawnPlayers(id);
-	}
-
-	public override void _Input(InputEvent @event)
-	{
-		if (@event.IsActionPressed("OpenOptions"))
-		{
-			if (OptionsMenuInstance is null)
-			{
-				OptionsMenuInstance = OptionsScene.Instantiate();
-				AddChild(OptionsMenuInstance);
-			}
-			else
-			{
-				OptionsMenuInstance.QueueFree();
-				OptionsMenuInstance = null;
-			}
-		}
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
@@ -89,7 +62,7 @@ public partial class World : Node3D
 
 	private void SpawnPlayer(long id)
 	{
-		Player playerInstance = (Player)PlayerScene.Instantiate();
+		Character playerInstance = (Character)PlayerScene.Instantiate();
 		playerInstance.Name = id.ToString();
 		playerInstance.OnPlayerDead += ResetGame;
 
@@ -123,11 +96,6 @@ public partial class World : Node3D
 			player.Name = "PendingDestroyPlayer"; // We change the name so that its not taken when spawning a new one
 			player.QueueFree();
 		}
-	}
-
-	public void TravelToMenu()
-	{
-		GetTree().ChangeSceneToPacked(MenuScene);
 	}
 
 	public override void _Notification(int what)

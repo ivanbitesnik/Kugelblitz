@@ -1,7 +1,11 @@
-[gd_scene load_steps=13 format=3 uid="uid://d2e0u4o6eefuv"]
+[gd_scene load_steps=17 format=3 uid="uid://d2e0u4o6eefuv"]
 
-[ext_resource type="Script" path="res://Character/Player.cs" id="1_rrd4t"]
-[ext_resource type="Script" path="res://Character/Weapon.cs" id="2_7aen2"]
+[ext_resource type="Script" path="res://Character/MultiplayerCharacter.cs" id="1_wcywk"]
+[ext_resource type="Material" uid="uid://777bmm3fg762" path="res://Shaders/Player1Material.tres" id="2_exy83"]
+[ext_resource type="Material" uid="uid://b8pgplgv5mp01" path="res://Shaders/Player2Material.tres" id="3_5stfr"]
+[ext_resource type="Material" uid="uid://dpjhitmi3esic" path="res://Shaders/DamagedPlayerMaterial.tres" id="4_nl655"]
+[ext_resource type="Material" uid="uid://kuphnhc6o0y1" path="res://Shaders/ParryingPlayerMaterial.tres" id="5_lruup"]
+[ext_resource type="Script" path="res://Character/Weapon.cs" id="6_j6qhs"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_y6icq"]
 
@@ -46,20 +50,25 @@ width = 200
 height = 20
 
 [node name="Player" type="CharacterBody3D"]
-script = ExtResource("1_rrd4t")
+script = ExtResource("1_wcywk")
 DashDistance = 150.0
 ParryDuration = 0.5
 ParryCooldown = 2.0
+Player1ColorMaterial = ExtResource("2_exy83")
+Player2ColorMaterial = ExtResource("3_5stfr")
+DamagedMaterial = ExtResource("4_nl655")
+ParryingMaterial = ExtResource("5_lruup")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("CapsuleShape3D_y6icq")
 
 [node name="PlayerMesh" type="MeshInstance3D" parent="."]
 mesh = SubResource("CapsuleMesh_2q4e4")
+surface_material_override/0 = ExtResource("5_lruup")
 
 [node name="Weapon" type="StaticBody3D" parent="."]
 transform = Transform3D(0.1, 0, 0, 0, -4.37114e-09, -0.1, 0, 0.1, -4.37114e-09, -0.00343966, 0, -0.559414)
-script = ExtResource("2_7aen2")
+script = ExtResource("6_j6qhs")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Weapon"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.76439, -2.75605)

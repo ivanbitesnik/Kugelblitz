@@ -1,0 +1,9 @@
+[gd_scene load_steps=3 format=3 uid="uid://lww6l03potuj"]
+
+[ext_resource type="Script" path="res://Levels/Worlds/MultiplayerWorld.cs" id="1_j6usg"]
+[ext_resource type="PackedScene" uid="uid://b5d5ci2xama1h" path="res://Debug/printdebug.tscn" id="2_vpp6m"]
+
+[node name="World" type="Node3D"]
+script = ExtResource("1_j6usg")
+
+[node name="Printdebug" parent="." instance=ExtResource("2_vpp6m")]

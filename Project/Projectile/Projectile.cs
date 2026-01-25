@@ -1,28 +1,27 @@
 using Godot;
 using System;
-using Kugelblitz.Character;
 using System.Threading.Tasks;
 
 public partial class Projectile : RigidBody3D
 {
 	[Export] private float Damage;
-	private Color Color;
+	private Material ColorMaterial;
 	public float ProjectileSize = 1.0f;
 
 	public bool HasReportedHit {get; private set;}= false;
 	public bool IsWaitingHitReport {get; private set;}= false;
 	public bool IsProjectileMerged {get; private set;}= false;
 	
-	public void Initialize(Vector3 position, Vector3 direction, float speed, Color color)
+	public void Initialize(Vector3 position, Vector3 direction, float speed, Material colorMaterial)
 	{
-		Color = color;
+		ColorMaterial = colorMaterial;
 		Position = position;
 		SetLinearVelocity(new Vector3(direction.X * speed, 0.0f, direction.Z * speed));
 	}
 	
 	public override void _Ready()
 	{
-		GetNode<MeshInstance3D>("MeshInstance3D").SetSurfaceOverrideMaterial(0, new StandardMaterial3D() { AlbedoColor = Color});
+		GetNode<MeshInstance3D>("MeshInstance3D").SetSurfaceOverrideMaterial(0, ColorMaterial);
 		
 		ContactMonitor = true;
 		MaxContactsReported = 1;
@@ -49,7 +48,7 @@ public partial class Projectile : RigidBody3D
 			return;
 		}
 		
-		var player = otherBody as Player;
+		var player = otherBody as MultiplayerCharacter;
 		if (player is not null)
 		{
 			if (player.IsParrying) 
@@ -83,7 +82,7 @@ public partial class Projectile : RigidBody3D
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
 	private void ApplyDamage(string playerPath)
 	{
-		Player player = GetTree().Root.GetNode<Player>(playerPath);
+		Character player = GetTree().Root.GetNode<Character>(playerPath);
 		player.ReceiveDamage(Damage);
 
 		DestroyProjectile();
