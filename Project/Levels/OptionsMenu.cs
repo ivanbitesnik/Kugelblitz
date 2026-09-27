@@ -12,25 +12,27 @@ public partial class OptionsMenu : Control
 
 	public void _on_return_to_menu_button_up()
 	{
-		MultiplayerWorld multWorld = (MultiplayerWorld)worldNode;
-		if (multWorld != null)
-        {
-			if (Multiplayer.IsServer())
+		if (!Globals.GlobalSettings.Instance.bIsMultiplayer)
+		{
+			worldNode.TravelToMenu();
+			return;
+		}
+		
+		if (Multiplayer.IsServer())
+		{
+			foreach (int peer in Multiplayer.GetPeers())
 			{
-				foreach (int peer in Multiplayer.GetPeers())
-				{
-					multWorld.OnPeerReturnedToMenu(peer);
-				}
+				worldNode.OnPeerReturnedToMenu(peer);
+			}
 
-				Multiplayer.MultiplayerPeer.Close();
-				Multiplayer.MultiplayerPeer = new OfflineMultiplayerPeer();
-				worldNode.TravelToMenu();
-			}
-			else
-			{
-				multWorld.Rpc(nameof(MultiplayerWorld.OnPeerReturnedToMenu), Multiplayer.MultiplayerPeer.GetUniqueId());
-			}
-        }
+			Multiplayer.MultiplayerPeer.Close();
+			Multiplayer.MultiplayerPeer = new OfflineMultiplayerPeer();
+			worldNode.TravelToMenu();
+		}
+		else
+		{
+			worldNode.Rpc(nameof(World.OnPeerReturnedToMenu), Multiplayer.MultiplayerPeer.GetUniqueId());
+		}
 	}
 
 	public void _on_exit_game_button_up()

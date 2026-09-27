@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://by46tjt8e7lwc"]
+
+[ext_resource type="Script" path="res://Globals/GlobalSettings.cs" id="1_beoc8"]
+
+[node name="Globals" type="Node"]
+script = ExtResource("1_beoc8")

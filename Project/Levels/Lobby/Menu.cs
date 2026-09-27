@@ -6,8 +6,7 @@ using System.Net.Sockets;
 
 public partial class Menu : Node
 {
-	[Export] private PackedScene MultiplayerWorldScene = GD.Load<PackedScene>("res://Levels/Worlds/MultiplayerWorld.tscn");
-	[Export] private PackedScene SinglePlayerWorldScene = GD.Load<PackedScene>("res://Levels/Worlds/SingleplayerWorld.tscn");
+	[Export] private PackedScene WorldScene = GD.Load<PackedScene>("res://Levels/World.tscn");
 	
 	private GDScript P2PFunctionLibrary = GD.Load<GDScript>("res://Levels/Lobby/P2PFunctionLibrary.gd");
 	private Node P2PFunctionLibraryNode;
@@ -25,6 +24,7 @@ public partial class Menu : Node
 	public override void _Ready()
 	{
 		SetMultiplayerAuthority(1);
+		Globals.GlobalSettings.Instance.bIsMultiplayer = true;
 
 		P2PFunctionLibraryNode = (Node)P2PFunctionLibrary.New();
 		AddChild(P2PFunctionLibraryNode);
@@ -42,7 +42,7 @@ public partial class Menu : Node
 
 		StagingScreen = GetNode<StagingScreen>("StagingScreen");
 		StagingScreen.Hide();
-		StagingScreen.OnAllPlayersReady += TravelToMultiplayerWorld;
+		StagingScreen.OnAllPlayersReady += TravelToWorld;
 
 		SteamStatic.InitRelayNetworkAccess();
 
@@ -79,7 +79,7 @@ public partial class Menu : Node
 		}
 		else
 		{
-			Rpc(nameof(TravelToMultiplayerWorld));
+			Rpc(nameof(TravelToWorld));
 		}
 	}
 
@@ -97,8 +97,9 @@ public partial class Menu : Node
 	}
 
 	private void _on_single_player_pressed()
-    {
-		TravelToSinglePlayerWorld();
+	{
+		Globals.GlobalSettings.Instance.bIsMultiplayer = false;
+		TravelToWorld();
     }
 
 	private void _on_host_pressed()
@@ -239,17 +240,11 @@ public partial class Menu : Node
 	}
 
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-	private void TravelToMultiplayerWorld()
+	private void TravelToWorld()
 	{
 		LeaveLobby();
-		GetTree().ChangeSceneToPacked(MultiplayerWorldScene);
+		GetTree().ChangeSceneToPacked(WorldScene);
 	}
-
-	private void TravelToSinglePlayerWorld()
-    {
-		LeaveLobby();
-		GetTree().ChangeSceneToPacked(SinglePlayerWorldScene);
-    }
 
 	public override void _Notification(int what)
 	{

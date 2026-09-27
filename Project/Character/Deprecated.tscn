@@ -1,0 +1,107 @@
+[gd_scene load_steps=17 format=3 uid="uid://d2e0u4o6eefuv"]
+
+[ext_resource type="Script" path="res://Character/Deprecated.cs" id="1_o7yyh"]
+[ext_resource type="Material" uid="uid://777bmm3fg762" path="res://Shaders/Player1Material.tres" id="2_nvp8d"]
+[ext_resource type="Material" uid="uid://b8pgplgv5mp01" path="res://Shaders/Player2Material.tres" id="3_1wdtk"]
+[ext_resource type="Material" uid="uid://dpjhitmi3esic" path="res://Shaders/DamagedPlayerMaterial.tres" id="4_5vnlp"]
+[ext_resource type="Material" uid="uid://kuphnhc6o0y1" path="res://Shaders/ParryingPlayerMaterial.tres" id="5_gjhox"]
+[ext_resource type="Script" path="res://Character/Weapon.cs" id="6_kpign"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_y6icq"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_2q4e4"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7wgy4"]
+albedo_color = Color(0, 0, 0, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_ypf1s"]
+material = SubResource("StandardMaterial3D_7wgy4")
+height = 5.135
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_ov1yv"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:rotation")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_7sqhb"]
+viewport_path = NodePath("HealthbarSprite/SubViewport")
+
+[sub_resource type="Gradient" id="Gradient_qsu2s"]
+interpolation_color_space = 1
+offsets = PackedFloat32Array(0)
+colors = PackedColorArray(1, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_hsy7c"]
+gradient = SubResource("Gradient_qsu2s")
+width = 200
+height = 20
+
+[sub_resource type="Gradient" id="Gradient_vl636"]
+interpolation_color_space = 1
+offsets = PackedFloat32Array(0)
+colors = PackedColorArray(0, 1, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_kqxhr"]
+gradient = SubResource("Gradient_vl636")
+width = 200
+height = 20
+
+[node name="Player" type="CharacterBody3D"]
+script = ExtResource("1_o7yyh")
+DashDistance = 150.0
+ParryDuration = 0.5
+ParryCooldown = 2.0
+Player1ColorMaterial = ExtResource("2_nvp8d")
+Player2ColorMaterial = ExtResource("3_1wdtk")
+DamagedMaterial = ExtResource("4_5vnlp")
+ParryingMaterial = ExtResource("5_gjhox")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape3D_y6icq")
+
+[node name="PlayerMesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("CapsuleMesh_2q4e4")
+surface_material_override/0 = ExtResource("5_gjhox")
+
+[node name="Weapon" type="StaticBody3D" parent="."]
+transform = Transform3D(0.1, 0, 0, 0, -4.37114e-09, -0.1, 0, 0.1, -4.37114e-09, -0.00343966, 0, -0.559414)
+script = ExtResource("6_kpign")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Weapon"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.76439, -2.75605)
+mesh = SubResource("CylinderMesh_ypf1s")
+
+[node name="Muzzle" type="Marker3D" parent="Weapon"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -4.26834, -2.57175)
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="."]
+replication_config = SubResource("SceneReplicationConfig_ov1yv")
+
+[node name="HealthbarSprite" type="Sprite3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.44, -1.59993)
+top_level = true
+axis = 1
+texture = SubResource("ViewportTexture_7sqhb")
+
+[node name="SubViewport" type="SubViewport" parent="HealthbarSprite"]
+size = Vector2i(200, 20)
+render_target_update_mode = 4
+
+[node name="Healthbar" type="TextureProgressBar" parent="HealthbarSprite/SubViewport"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -10.0
+offset_right = 100.0
+offset_bottom = 10.0
+grow_horizontal = 2
+grow_vertical = 2
+value = 100.0
+texture_under = SubResource("GradientTexture2D_hsy7c")
+texture_progress = SubResource("GradientTexture2D_kqxhr")
